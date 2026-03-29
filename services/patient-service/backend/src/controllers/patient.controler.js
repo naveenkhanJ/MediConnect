@@ -1,7 +1,7 @@
 //register a new patient
 
-const bcrypt = require('bcrypt');
-const pool = require('../config/db');
+import bcrypt from 'bcrypt';
+import pool from '../config/db.js';
 
 const registerPatient = async (req, res) => {
   try {
@@ -48,6 +48,8 @@ const updateProfile = async (req, res) => {
 };
 
 //book an appointment for a patient
+
+export { registerPatient, getProfile, updateProfile };
 
 const bookAppointment = async (req, res) => {
   const { patient_id, doctor_id, appointment_date } = req.body;
