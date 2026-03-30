@@ -5,14 +5,14 @@ import pool from '../config/db.js';
 
 const registerPatient = async (req, res) => {
   try {
-    const { name, email, password, age } = req.body;
+    const { name, email, password, age,gender,contact } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO patients (name, email, password, age)
-       VALUES ($1, $2, $3, $4) RETURNING id, name, email`,
-      [name, email, hashedPassword, age]
+      `INSERT INTO patients (name, email, password, age, gender, contact)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email`,
+      [name, email, hashedPassword, age, gender, contact]
     );
 
     res.json(result.rows[0]);
@@ -24,14 +24,24 @@ const registerPatient = async (req, res) => {
 //view profile of a patient
 
 const getProfile = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const result = await pool.query(
-    'SELECT id, name, email, age FROM patients WHERE id=$1',
-    [id]
-  );
+    const result = await pool.query(
+      'SELECT id, name, email, age, gender, contact FROM patients WHERE id=$1',
+      [id]
+    );
 
-  res.json(result.rows[0]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error("❌ ERROR:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 //update profile of a patient
