@@ -3,6 +3,7 @@
 import bcrypt from 'bcrypt';
 import pool from '../config/db.js';
 
+
 const registerPatient = async (req, res) => {
   try {
     const { name, email, password, age,gender,contact } = req.body;
@@ -47,20 +48,36 @@ const getProfile = async (req, res) => {
 //update profile of a patient
 const updateProfile = async (req, res) => {
   const { id } = req.params;
-  const { name, age } = req.body;
+  const { name,email, age, gender, contact } = req.body;
 
   const result = await pool.query(
-    `UPDATE patients SET name=$1, age=$2 WHERE id=$3 RETURNING *`,
-    [name, age, id]
+    `UPDATE patients SET name=$1, email=$2, age=$3, gender=$4, contact=$5 WHERE id=$6 RETURNING *`,
+    [name, email, age, gender, contact, id]
   );
 
   res.json(result.rows[0]);
 };
 
+//upload report for a patient
+
+const uploadReport = async (req, res) => {
+  try {
+    const { patient_id, report_name, file_url, description } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO reports (patient_id, report_name, file_url, description)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [patient_id, report_name, file_url, description]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 //book an appointment for a patient
-
-export { registerPatient, getProfile, updateProfile };
-
 const bookAppointment = async (req, res) => {
   const { patient_id, doctor_id, appointment_date } = req.body;
 
@@ -85,3 +102,6 @@ const getPrescriptions = async (req, res) => {
 
   res.json(result.rows);
 };
+
+
+export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions };
