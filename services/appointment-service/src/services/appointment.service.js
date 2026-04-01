@@ -10,7 +10,6 @@ import {
   getDoctorById,
   searchDoctorsBySpecialty
 } from "../providers/doctor.provider.js";
-import { generateJitsiMeetingLink } from "../utils/jitsi.util.js";
 
 export const searchDoctorsService = async (specialty) => {
   if (!specialty) {
@@ -156,10 +155,7 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
   appointment.status = "CONFIRMED";
   appointment.paymentId = paymentId;
 
-  if (appointment.consultationType === "ONLINE") {
-    appointment.meetingLink = generateJitsiMeetingLink(appointment.id);
-  }
-
+  
   await updateAppointment(appointment);
   return appointment;
 };
