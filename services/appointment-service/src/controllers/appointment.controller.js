@@ -19,8 +19,9 @@ export const searchDoctorsController = async (req, res) => {
 
 export const createAppointmentController = async (req, res) => {
   try {
+    const patientId = req.user ? req.user.id : req.body.patientId;
     const result = await createAppointmentService({
-      patientId: req.user.id,
+      patientId,
       doctorId: req.body.doctorId,
       appointmentDate: req.body.appointmentDate,
       timeSlot: req.body.timeSlot,

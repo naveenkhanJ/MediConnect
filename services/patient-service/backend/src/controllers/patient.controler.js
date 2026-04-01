@@ -103,5 +103,36 @@ const getPrescriptions = async (req, res) => {
   res.json(result.rows);
 };
 
+//create doctor appointment
+const createDoctorAppointment = async (req, res) => {
+  try {
+    const { patientId, doctorId, appointmentDate, timeSlot, consultationType } = req.body;
 
-export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions };
+    const response = await fetch('http://localhost:5001/api/appointments/internal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patientId,
+        doctorId,
+        appointmentDate,
+        timeSlot,
+        consultationType: consultationType || 'ONLINE'
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment };

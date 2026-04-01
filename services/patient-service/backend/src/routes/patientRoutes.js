@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerPatient, getProfile, updateProfile ,uploadReport} from '../controllers/patient.controler.js';
+import { registerPatient, getProfile, updateProfile ,uploadReport, createDoctorAppointment} from '../controllers/patient.controler.js';
 
 const router = express.Router();
 
@@ -14,5 +14,8 @@ router.put('/:id', updateProfile);
 
 //upload report for a patient
 router.post('/reports', uploadReport);
+
+// Create doctor appointment
+router.post('/appointments', createDoctorAppointment);
 
 export default router;
