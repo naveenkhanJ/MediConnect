@@ -35,3 +35,25 @@ coverage/
 
 # Misc
 *.local
+
+# Frontend Next.js specific
+frontend/mediconnect/.next/
+frontend/mediconnect/out/
+frontend/mediconnect/.pnp
+frontend/mediconnect/.pnp.*
+frontend/mediconnect/.yarn/*
+!frontend/mediconnect/.yarn/patches
+!frontend/mediconnect/.yarn/plugins
+!frontend/mediconnect/.yarn/releases
+!frontend/mediconnect/.yarn/versions
+frontend/mediconnect/coverage
+frontend/mediconnect/.DS_Store
+frontend/mediconnect/*.pem
+frontend/mediconnect/npm-debug.log*
+frontend/mediconnect/yarn-debug.log*
+frontend/mediconnect/yarn-error.log*
+frontend/mediconnect/.pnpm-debug.log*
+frontend/mediconnect/.env*
+frontend/mediconnect/.vercel
+frontend/mediconnect/*.tsbuildinfo
+frontend/mediconnect/next-env.d.ts
