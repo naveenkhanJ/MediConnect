@@ -6,46 +6,49 @@ export const NavLinks = [
 ];
 
 
-import appointment_img from '../public/appointment_img.png'
-import header_img from '../public/header_img.png'
-import group_profiles from '../public/group_profiles.png'
-import profile_pic from '../public/profile_pic.png'
-import contact_image from '../public/contact_image.png'
-import about_image from '../public/about_image.png'
-import logo from '../public/logo.svg'
-import dropdown_icon from '../public/dropdown_icon.svg'
-import menu_icon from '../public/menu_icon.svg'
-import cross_icon from '../public/cross_icon.png'
-import chats_icon from '../public/chats_icon.svg'
-import verified_icon from '../public/verified_icon.svg'
-import arrow_icon from '../public/arrow_icon.svg'
-import info_icon from '../public/info_icon.svg'
-import upload_icon from '../public/upload_icon.png'
-import stripe_logo from '../public/stripe_logo.png'
-import razorpay_logo from '../public/razorpay_logo.png'
+import appointment_img from '../public/images/appointment_img.png'
+import header_img from '../public/images/header_img.png'
+import group_profiles from '../public/images/group_profiles.png'
+import profile_pic from '../public/images/profile_pic.png'
+import contact_image from '../public/images/contact_image.png'
+import about_image from '../public/images/about_image.png'
+import logo from '../public/images/logo.svg'
+import dropdown_icon from '../public/images/dropdown_icon.svg'
+import menu_icon from '../public/images/menu_icon.svg'
+import cross_icon from '../public/images/cross_icon.png'
+import chats_icon from '../public/images/chats_icon.svg'
+import verified_icon from '../public/images/verified_icon.svg'
+import arrow_icon from '../public/images/arrow_icon.svg'
+import info_icon from '../public/images/info_icon.svg'
+import upload_icon from '../public/images/upload_icon.png'
+import stripe_logo from '../public/images/stripe_logo.png'
+import razorpay_logo from '../public/images/razorpay_logo.png'
 
-import doc1 from '../public/doc1.png'
-import doc2 from '../public/doc2.png'
-import doc3 from '../public/doc3.png'
-import doc4 from '../public/doc4.png'
-import doc5 from '../public/doc5.png'
-import doc6 from '../public/doc6.png'
-import doc7 from '../public/doc7.png'
-import doc8 from '../public/doc8.png'
-import doc9 from '../public/doc9.png'
-import doc10 from '../public/doc10.png'
-import doc11 from '../public/doc11.png'
-import doc12 from '../public/doc12.png'
-import doc13 from '../public/doc13.png'
-import doc14 from '../public/doc14.png'
-import doc15 from '../public/doc15.png'
+import doc1 from '../public/images/doc1.png'
+import doc2 from '../public/images/doc2.png'
+import doc3 from '../public/images/doc3.png'
+import doc4 from '../public/images/doc4.png'
+import doc5 from '../public/images/doc5.png'
+import doc6 from '../public/images/doc6.png'
+import doc7 from '../public/images/doc7.png'
+import doc8 from '../public/images/doc8.png'
+import doc9 from '../public/images/doc9.png'
+import doc10 from '../public/images/doc10.png'
+import doc11 from '../public/images/doc11.png'
+import doc12 from '../public/images/doc12.png'
+import doc13 from '../public/images/doc13.png'
+import doc14 from '../public/images/doc14.png'
+import doc15 from '../public/images/doc15.png'
 
-import General_physician from '../public/General_physician.svg'
-import Gynecologist from '../public/Gynecologist.svg'
-import Dermatologist from '../public/Dermatologist.svg'
-import Pediatricians from '../public/Pediatricians.svg'
-import Neurologist from '../public/Neurologist.svg'
-import Gastroenterologist from '../public/Gastroenterologist.svg'
+
+import General_physician from '../public/images/General_physician.svg'
+import Gynecologist from '../public/images/Gynecologist.svg'
+import Dermatologist from '../public/images/Dermatologist.svg'
+import Pediatricians from '../public/images/Pediatricians.svg'
+import Neurologist from '../public/images/Neurologist.svg'
+import Gastroenterologist from '../public/images/Gastroenterologist.svg'
+
+
 
 
 
@@ -70,6 +73,19 @@ export const assets = {
     stripe_logo,
     razorpay_logo
 }
+
+export const services = [
+  { title: "X-Ray Imaging and Reporting", icon: "🩻" },
+  { title: "Audiology & Hearing Checkups", icon: "👂" },
+  { title: "Gynecological Examinations", icon: "🤰" },
+  { title: "Orthopedic Checkups", icon: "🦴" },
+  { title: "Pulmonology and Lung Trials", icon: "🫁" },
+  { title: "Microbiology & Viral Trials", icon: "🔬" },
+  { title: "Renal Examinations", icon: "➿" },
+  { title: "Neurology & Psychology", icon: "🧠" },
+  { title: "Pregnancy Monitoring", icon: "👶" },
+  { title: "Nutrition and Dietetics", icon: "⚖️" },
+];
 
 export const specialityData = [
     {

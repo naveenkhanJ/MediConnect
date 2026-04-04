@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { COLORS } from "@/style/color";
+import Link from "next/link";
 
 
 export default function Navbar() {
@@ -27,35 +28,41 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center gap-10 text-gray-700 font-medium">
           <li className="cursor-pointer hover:text-[#5F6FFF]  hover:border-b-2 text-bold border-primary pb-1">
-            Home
+           <Link href="/">Home</Link>
           </li>
           <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold ">
-            Doctors
+            <Link href="/doctor">Doctors</Link>
           </li>
            <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold">
-            Services
+            <Link href="/services">Services</Link>
           </li>
           <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold ">
-            About
+            <Link href="/about">About</Link>
           </li>
           <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold">
-            Contact
+            <Link href="/contact">Contact</Link>
           </li>
          
         </ul>
 
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <button className="text-primary font-medium cursor-pointer border border-[#5F6FFF] px-6 py-2 rounded-full text-sm ">
+
+          <Link href="/Auth/login">
+          <button  className="text-primary font-medium cursor-pointer border border-[#5F6FFF] px-6 py-2 rounded-full text-sm ">
             Sign In
           </button>
-
+          </Link>
+          
+          
+          <Link href="/Auth/register">
           <button
             className="text-white px-6 py-2 cursor-pointer rounded-full text-sm font-medium"
             style={{ backgroundColor: COLORS.primary }}
           >
             Register
           </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}

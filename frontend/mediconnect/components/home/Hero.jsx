@@ -1,8 +1,8 @@
 import Image from "next/image";
-
+import { DoctorSearch } from "@/components/home/SearchBar";
 export default function Hero() {
   return (
-    <section className="w-full min-h-screen bg-gradient-to-r from-[#EEF0FF] to-white flex items-center lg:px-20 md:px-16 px-12 ">
+    <section className=" relative w-full min-h-screen bg-gradient-to-r from-[#EEF0FF] to-white flex items-center lg:px-20 md:px-16 px-6 ">
       <div className="grid md:grid-cols-2 gap-10 items-center w-full">
 
         {/* LEFT SIDE */}
@@ -22,12 +22,14 @@ export default function Hero() {
           {/* Description */}
           <p className="text-gray-500 text-base max-w-lg">
             We offers 24/7 access to healthcare services, empowering you to stay healthy without stepping outside.
+          
           </p>
 
           {/* Button */}
           <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
             Schedule an appointment
           </button>
+        
 
           {/* Stats */}
           <div className="flex gap-4 pt-4">
@@ -40,7 +42,7 @@ export default function Hero() {
               <p className="text-gray-500 text-sm">Years experience</p>
             </div>
             <div className="bg-gradient-to-r from-white to-[#f5f5f5] p-4 rounded-md">
-              <h2 className="text-3xl font-bold">10K+</h2>
+              <h2 className="text-3xl font-bold">10k+</h2>
               <p className="text-gray-500 text-sm">Care with services</p>
             </div>
           </div>
@@ -63,8 +65,14 @@ export default function Hero() {
             <p className="text-md text
             -gray-500 font-bold">Latest visit Doctor</p>
 
-            <h2 className="text-2xl font-bold">790+</h2>
-            <p className="text-sm text-gray-500">Care with Services</p>
+            <img
+              src="/images/group_profiles.png"
+              width={80}
+              height={50}
+              className="rounded-full mt-2"
+              alt="doctor"
+              />
+            <p className="text-sm text-gray-500 mt-2">Care with Services</p>
           </div>
 
           {/* Floating Icons */}
@@ -72,6 +80,10 @@ export default function Hero() {
 
         </div>
       </div>
+     {/* Search Bar (OVERLAP) */}
+  <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 bottom-0 w-full px-4 md:px-0 flex justify-center">
+    <DoctorSearch />
+  </div>
     </section>
   );
 }
