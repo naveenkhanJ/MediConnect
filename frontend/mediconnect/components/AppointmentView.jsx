@@ -48,7 +48,7 @@ export default function AppointmentView({
             <div
               key={index}
               onClick={() => setSelectedDate(index)}
-              className={`px-4 cursor-pointer py-6 rounded-full  ${
+              className={`px-4 cursor-pointer py-8 rounded-full  ${
                 selectedDate === index ? "bg-[#5F6FFF] text-white" : "bg-gray-200"
               }`}
             >
@@ -57,7 +57,7 @@ export default function AppointmentView({
           ))}
         </div>
 
-        <div className="flex items-center py-2 max-w-[800px] cursor-pointer gap-3 mt-4 overflow-x-scroll scrollbar-hide ">
+        <div className="flex items-center py-2 max-w-[800px] cursor-pointer gap-3 mt-4 overflow-x-scroll  ">
           {docSlot[selectedDate]?.slots.map((slot, i) => (
             <p
               key={i}

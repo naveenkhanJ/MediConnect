@@ -74,17 +74,28 @@ export const assets = {
     razorpay_logo
 }
 
+
 export const services = [
-  { title: "X-Ray Imaging and Reporting", icon: "🩻" },
-  { title: "Audiology & Hearing Checkups", icon: "👂" },
-  { title: "Gynecological Examinations", icon: "🤰" },
-  { title: "Orthopedic Checkups", icon: "🦴" },
-  { title: "Pulmonology and Lung Trials", icon: "🫁" },
-  { title: "Microbiology & Viral Trials", icon: "🔬" },
-  { title: "Renal Examinations", icon: "➿" },
-  { title: "Neurology & Psychology", icon: "🧠" },
-  { title: "Pregnancy Monitoring", icon: "👶" },
-  { title: "Nutrition and Dietetics", icon: "⚖️" },
+  {
+    title: "Comprehensive Care",
+    desc: "Full dental care for all ages with preventive and advanced treatments.",
+  },
+  {
+    title: "Advanced Technology",
+    desc: "We use modern equipment for accurate diagnosis and safe procedures.",
+  },
+  {
+    title: "Online Consultation",
+    desc: "Get expert advice from home with our easy online consultation.",
+  },
+  {
+    title: "24/7 Emergency Support",
+    desc: "Immediate help for urgent dental issues anytime.",
+  },
+  {
+    title: "Free Consultation Call",
+    desc: "Talk to our experts and get guidance before booking.",
+  },
 ];
 
 export const specialityData = [
