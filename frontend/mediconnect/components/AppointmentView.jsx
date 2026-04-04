@@ -57,7 +57,7 @@ export default function AppointmentView({
           ))}
         </div>
 
-        <div className="flex items-center py-2 max-w-[800px] cursor-pointer gap-3 mt-4 overflow-x-scroll ">
+        <div className="flex items-center py-2 max-w-[800px] cursor-pointer gap-3 mt-4 overflow-x-scroll scrollbar-hide ">
           {docSlot[selectedDate]?.slots.map((slot, i) => (
             <p
               key={i}
