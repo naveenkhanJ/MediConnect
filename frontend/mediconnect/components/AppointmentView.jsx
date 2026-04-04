@@ -1,6 +1,9 @@
 import { AppContext } from '@/context/AppContext';
 import Image from 'next/image';
 import { useContext } from 'react';
+import {assets} from '../assets/data';
+
+
 
 export default function AppointmentView({
   docInfo,
@@ -12,6 +15,7 @@ export default function AppointmentView({
 }) {
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const {doctors, currencySymbol}=useContext(AppContext);
+  
 
   if (!docInfo) return <p>Loading...</p>;
 
@@ -24,7 +28,7 @@ export default function AppointmentView({
         <div className="flex-1 border border-gray-400 py-7 p-8 bg-white rounded-lg ">
           <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
             {docInfo.name} 
-            <Image src={docInfo.verified_icon} alt="Badge" width={5} height={5} /></p>
+            <Image src={assets.verified_icon} alt="Badge" width={16} height={10} /></p>
           <div className='flex items-center gap-2 text-sm mt-1 text-gray-600'>
           <p>{docInfo.degree}</p>
           <p>{docInfo.speciality}</p>
