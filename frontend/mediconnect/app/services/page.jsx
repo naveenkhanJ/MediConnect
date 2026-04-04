@@ -16,7 +16,7 @@ export default function ServicesSection() {
   };
 
   return (
-    <section className="w-full px-6 md:px-16 py-8 bg-gradient-to-r from-[#f3f4fb] to-white ">
+    <section className="w-full px-6 md:px-16 py-20 bg-gradient-to-r from-[#f3f4fb] to-white  ">
       
       <div className="grid md:grid-cols-2 gap-10 items-start">
 
