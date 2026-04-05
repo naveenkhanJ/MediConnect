@@ -25,7 +25,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#5F6FFF] to-[#EEF0FF] px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4 py-10">
       
       <div className="bg-white shadow-xl rounded-lg w-full max-w-2xl p-8">
         
@@ -47,7 +47,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your name"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             />
           </div>
 
@@ -61,7 +61,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your email"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-[#5F6FFF]"
             />
           </div>
 
@@ -75,7 +75,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your phone"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             />
           </div>
 
@@ -89,7 +89,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter password"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             />
           </div>
 
@@ -103,7 +103,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your address"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default function RegisterPage() {
               value={form.gender}
               onChange={handleChange}
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             >
               <option value="">Select</option>
               <option value="male">Male</option>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
               value={form.birthday}
               onChange={handleChange}
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
             />
           </div>
 

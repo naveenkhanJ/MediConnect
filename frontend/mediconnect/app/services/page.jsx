@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
-import serviceImg from "../../public/images/online1.jpg";
+import serviceImg from "../../public/images/onl3.webp";
 import { services } from "@/assets/data";
 
 
@@ -16,7 +16,8 @@ export default function ServicesSection() {
   };
 
   return (
-    <section className="w-full px-6 md:px-16 py-20 bg-gradient-to-r from-[#f3f4fb] to-white  ">
+    <section className="w-full px-6 md:px-16 py-12 bg-gradient-to-r from-[#f3f4fb] to-white  ">
+    
       
       <div className="grid md:grid-cols-2 gap-10 items-start">
 
@@ -63,15 +64,14 @@ export default function ServicesSection() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="ml-8 ">
+        <div className="ml-8 max-w-[550px] ">
           {/* Top description */}
-          <p className="text-gray-600 mb-8 max-w-[500px]  mt-14 ">
-            Stay relaxed and find the comfort every visit and simple answers.
-            We provide modern dentistry with care and convenience.
+          <p className="text-gray-900 mb-8 ]  mt-14 ">
+            Stay relaxed and experience complete comfort during every visit, knowing that your care is our top priority. We aim to create a calm and welcoming environment where all your concerns are addressed with clarity and ease, providing simple and understandable answers to your questions
           </p>
 
           {/* Image */}
-          <div className=" rounded-xl shadow-md p-4 max-w-[550px] bg-gray-50 ">
+          <div className=" rounded-xl shadow-md p-4  bg-gray-50 ">
             <Image
               src={serviceImg}
             

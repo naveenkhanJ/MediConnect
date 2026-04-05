@@ -15,9 +15,9 @@ export default function DoctorCard() {
 
  
   return (
-    <section className="w-full px-6 md:px-18 py-12 bg-[#F9FAFB] ">
+    <section className="w-full px-6 md:px-18 py-20 sm:px-8 bg-[#F9FAFB] ">
       {/* Heading */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-12 ">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-12">
           Top Doctors to Book
         </h2>

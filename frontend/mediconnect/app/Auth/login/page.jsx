@@ -20,7 +20,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#5F6FFF] to-[#EEF0FF] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4">
       
       <div className="bg-white shadow-xl rounded-lg w-full max-w-md p-8">
         
