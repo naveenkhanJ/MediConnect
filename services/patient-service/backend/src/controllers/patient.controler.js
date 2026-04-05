@@ -28,19 +28,22 @@ const getProfile = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (String(req.patient?.id) !== String(id)) {
+      return res.status(403).json({ message: 'Forbidden. You can only view your own profile.' });
+    }
+
     const result = await pool.query(
       'SELECT id, name, email, age, gender, contact FROM patients WHERE id=$1',
       [id]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Patient not found" });
+      return res.status(404).json({ message: 'Patient not found' });
     }
 
     res.json(result.rows[0]);
-
   } catch (err) {
-    console.error("❌ ERROR:", err.message);
+    console.error('❌ ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 };
@@ -48,7 +51,11 @@ const getProfile = async (req, res) => {
 //update profile of a patient
 const updateProfile = async (req, res) => {
   const { id } = req.params;
-  const { name,email, age, gender, contact } = req.body;
+  const { name, email, age, gender, contact } = req.body;
+
+  if (String(req.patient?.id) !== String(id)) {
+    return res.status(403).json({ message: 'Forbidden. You can only update your own profile.' });
+  }
 
   const result = await pool.query(
     `UPDATE patients SET name=$1, email=$2, age=$3, gender=$4, contact=$5 WHERE id=$6 RETURNING *`,
@@ -59,10 +66,10 @@ const updateProfile = async (req, res) => {
 };
 
 //upload report for a patient
-
 const uploadReport = async (req, res) => {
   try {
-    const { patient_id, report_name, file_url, description } = req.body;
+    const { report_name, file_url, description } = req.body;
+    const patient_id = req.patient.id;
 
     const result = await pool.query(
       `INSERT INTO reports (patient_id, report_name, file_url, description)
@@ -79,7 +86,8 @@ const uploadReport = async (req, res) => {
 
 //book an appointment for a patient
 const bookAppointment = async (req, res) => {
-  const { patient_id, doctor_id, appointment_date } = req.body;
+  const patient_id = req.patient.id;
+  const { doctor_id, appointment_date } = req.body;
 
   const result = await pool.query(
     `INSERT INTO appointments (patient_id, doctor_id, appointment_date)
