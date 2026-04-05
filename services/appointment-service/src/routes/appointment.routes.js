@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.get("/doctors/search", searchDoctorsController);
 router.post("/", fakeAuth, createAppointmentController);
+router.post("/internal", createAppointmentController); // without auth
 router.put("/:id/reschedule", fakeAuth, rescheduleAppointmentController);
 router.put("/:id/cancel", fakeAuth, cancelAppointmentController);
 router.get("/:id/status", fakeAuth, getAppointmentStatusController);
