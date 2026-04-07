@@ -28,3 +28,10 @@ export const rejectAppointment = async (appointmnetId) =>{
     });
     return res.data;
 };
+
+//fetch all appointmnets for a doctor
+export const getDoctorAppointments = async (doctorId) =>{
+    const res = await axios.get(`${APPOINTMENT_SERVICE_URL}/doctor/${doctorId}`);
+     
+    return res.data;
+};
