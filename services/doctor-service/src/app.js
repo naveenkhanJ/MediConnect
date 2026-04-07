@@ -4,6 +4,7 @@ import availabilityRoute from "./routes/availability.routes.js";
 import appointmentRoute from "./routes/appointmentStatus.routes.js";
 import prescriptionRoutes from "./routes/prescription.routes.js";
 import reportRoutes from "./routes/report.routes.js";
+import profileRoutes from "./routes/doctorProfile.routes.js"
 import { fakeAuth } from "./middlewares/fakeAuth.js";
 const app = express();
 
@@ -21,6 +22,8 @@ app.use("/api/doctor",appointmentRoute);
 app.use("/api/prescriptions",prescriptionRoutes);
 //patient report
 app.use("/api/reports",reportRoutes);
+//manage profile
+app.use("/api/profile",profileRoutes);
 
 
 app.get("/doctor", (req, res) => {
