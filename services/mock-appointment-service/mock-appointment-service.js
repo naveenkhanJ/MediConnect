@@ -15,28 +15,28 @@ let appointments = [
     {
         id: "4",
         doctorId: "doc124",
-        patientName: "John Doe",
+      patientId: "pat003",
         appointmentDate: "2026-04-06",
         timeSlot: "10:00 AM",
-        status: "PENDING",
-        paymentStatus: "PENDING",
+        status: "CONFIRMED",
+        paymentStatus: "Confirmed",
     },
     {
         id: "5",
         doctorId: "doc124",
-        patientName: "Jane Smith",
+        patientId: "pat002",
         appointmentDate: "2026-04-06",
         timeSlot: "11:00 AM",
-        status: "PENDING",
+        status: "CONFIRMED",
         paymentStatus: "PAID",
     },
     {
         id: "6",
         doctorId: "doc124",
-        patientName: "Alice Brown",
+        patientId: "pat001",
         appointmentDate: "2026-04-07",
         timeSlot: "09:30 AM",
-        status: "PENDING",
+        status: "CONFIRMED",
         paymentStatus: "FAILED",
     },
 ];
@@ -61,6 +61,14 @@ app.patch("/api/appointments/:appointmentId/status", (req, res) => {
     appointments[apptIndex].status = status;
 
      res.json(appointments[apptIndex]);
+});
+
+app.get("/api/appointments/:id", (req, res) => {
+  const appointment = appointments.find(a => a.id === req.params.id);
+  if (!appointment) {
+    return res.status(404).json({ message: "Appointment not found" });
+  }
+  res.json(appointment);
 });
 
 // Start server
