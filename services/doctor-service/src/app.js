@@ -5,6 +5,7 @@ import appointmentRoute from "./routes/appointmentStatus.routes.js";
 import prescriptionRoutes from "./routes/prescription.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import profileRoutes from "./routes/doctorProfile.routes.js"
+import telemedicineRoutes from "./routes/doctorTelemedicine.route.js"
 import { fakeAuth } from "./middlewares/fakeAuth.js";
 const app = express();
 
@@ -24,6 +25,8 @@ app.use("/api/prescriptions",prescriptionRoutes);
 app.use("/api/reports",reportRoutes);
 //manage profile
 app.use("/api/profile",profileRoutes);
+//conduct video session
+app.use("/api/telemedicine",telemedicineRoutes);
 
 
 app.get("/doctor", (req, res) => {
