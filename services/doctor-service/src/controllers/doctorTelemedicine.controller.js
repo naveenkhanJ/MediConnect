@@ -1,4 +1,4 @@
-import { startTelemedicineSessionService } from "../services/Doctortelemedicine.service.js";
+import { startTelemedicineSessionService } from "../services/doctorTelemedicine.service.js";
 
 
 export const startTelemedicineController = async(req ,res) =>{
