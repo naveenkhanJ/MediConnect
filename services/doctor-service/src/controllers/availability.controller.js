@@ -41,7 +41,7 @@ export const deleteAvailabilityController = async (req, res) => {
     try{
         await deleteAvailabilityService(req.params.id);
         res.json({message: "Slot deleted"});
-    }catch{
+    }catch(err){
         res.status(400).json({message:err.message});
     }
 };

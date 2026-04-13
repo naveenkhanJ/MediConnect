@@ -1,13 +1,11 @@
 import Availability from "../models/availability.model.js";
 import { Op } from "sequelize";
+import { createAvailabilty, deleteAvailability, findAvailabilityByDoctorId, findAvailabilityById, findOverlappingAvailability, updateAvailability } from "../repositories/availability.repository.js";
 
 // Get all avilability slots by doctor id
 
 export const getDoctorAvailabilityService = async (doctorId) => {
-    return Availability.findAll({
-        where: { doctorId },
-        order: [["date", "ASC"], ["startTime", "ASC"]],
-    });
+    return findAvailabilityByDoctorId(doctorId);
 };
 
 // Add ne slot
@@ -20,28 +18,25 @@ export const addAvailabilityService = async ({ doctorId, date, startTime, endTim
 
     // overlap detection
 
-    const existing = await Availability.findOne({
-        where: {
+    const existing = await findOverlappingAvailability(
+
             doctorId,
             date,
-            [Op.and] : [
-                { startTime: {[Op.lt]: endTime}},
-                { endTime: {[Op.gt]: startTime}}
-            ]
-        }
-    });
+            startTime,
+            endTime
+    );
 
     if(existing){
         throw new Error("Time slot overlap exisiting availability time slot");
     }
 
-    return Availability.create({ doctorId, date, startTime, endTime});
+    return createAvailabilty({ doctorId, date, startTime, endTime});
 };
 
 //update a slot
 export const updateAvailabilityService = async (id, { date, startTime, endTime}) => {
 
-    const slot = await Availability.findByPk(id);
+    const slot = await findAvailabilityById(id);
     if(!slot){
         throw new Error("Availability slot not found");
     }
@@ -50,17 +45,13 @@ export const updateAvailabilityService = async (id, { date, startTime, endTime})
     }
 
     // overlap check
-    const existing = await Availability.findOne({
-        where: {
-            doctorId: slot.doctorId,
+    const existing = await findOverlappingAvailability(
+
+            doctorId,
             date,
-            id:{[Op.ne]: id },
-            [Op.and] : [
-                { startTime: {[Op.lt]: endTime}},
-                { endTime: {[Op.gt]: startTime}}
-            ]
-        }
-    });
+            startTime,
+            endTime
+    );
 
     if(existing){
         throw new Error("Time slot overlap exisiting availability time slot");
@@ -71,15 +62,15 @@ export const updateAvailabilityService = async (id, { date, startTime, endTime})
     slot.startTime = startTime;
     slot.endTime= endTime;
 
-    return slot.save();
+    return updateAvailability(slot);
 };
 
 
 // delete a slot
 export const deleteAvailabilityService = async (id) => {
-    const slot = await Availability.findByPk(id);
+    const slot = await findAvailabilityById(id);
     if(!slot){
          throw new Error("Availability slot not found");
     }
-    return slot.destroy();
+    return deleteAvailability(slot);
 };
