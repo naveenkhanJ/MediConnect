@@ -1,33 +1,34 @@
-import { approveAppointment, getPendingAppointments, rejectAppointment } from "../services/appointmentStatus.service.js";
+import { approveAppointment, getPendingAppointmentsService, handleAppointmentDesicionService, rejectAppointment } from "../services/appointmentStatus.service.js";
 
 //fetch pending appointmets for logged doctor
-export const fetchPendingAppointments = async (req,res) => {
+export const getPendingAppointmentsController = async (req,res) => {
     try{
         const doctorId = req.user.id;
-        const appointmenets = await getPendingAppointments(doctorId);
-        res.json(appointmenets);
+        const appointmenets = await getPendingAppointmentsService(doctorId);
+        res.status(200).json(appointmenets);
     }catch(err){
         res.status(500).json({message: err.message});
     }
 };
 
 //approve/reject appointments
-export const decideAppointment = async (req,res) => {
+export const decideAppointmentController = async (req,res) => {
     try{
         const doctorId = req.user.id;
-        const {appointmentId,status} = req.body;
+        const {appointmentId} = req.params;
+        const{status} = req.body;
 
-        if (!["Approve", "Reject"].includes(status)){
-            return res.status(400).json({message:"Status must be Approve or Reject"});
-        }
+        const result = await handleAppointmentDesicionService({
+            appointmentId,
+            doctorId,
+            status
+        });
 
-        // call service
-        const updated = status === "Approve"
-        ? await approveAppointment(appointmentId)
-        : await rejectAppointment(appointmentId);
-
-        res.json({message: `Appointment ${status.toLowerCase()} successfully`, appointment: updated});
+        res.status(200).json({
+            message: `Appointment ${status.toLowerCase()} successfully`,
+             appointment: result});
     }catch(err){
-        res.status(500),json({message: err.message});
+        res.status(400).json({message: err.message});
     }
 };
+

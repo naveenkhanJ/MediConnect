@@ -1,37 +1,50 @@
 import axios from "axios";
+import { getAppointmentByid, getAppointmentByIdRepo, getPendingAppointmentRepo, updateAppointmentDecisionRepo } from "../repositories/appointmentStatus.repository";
 
-const APPOINTMENT_SERVICE_URL = "http://localhost:5001/api/appointments";
+
+const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL;
 
 //get pending appointmenets for doctors
 
-export const getPendingAppointments = async(doctorId) => {
-    const res = await axios.get(`${APPOINTMENT_SERVICE_URL}/doctor/${doctorId}/pending`);
-    return res.data.map(appointment => ({
-        ...appointment,
-        paymentStaus: appointment.paymentStaus
-    }));
+export const handleAppointmentDesicionService = async ({
+    appointmentId,
+    doctorId,
+    status
+}) => {
+
+    const appointment = await getAppointmentByIdRepo(appointmentId);
+    
+    if(!appointment) {
+        throw new Error("Appointment not found");
+    }
+
+    //ensure doctor owns appointment
+    if(appointment.dactorId !== doctorId){
+        throw new Error("You are not allowed to modfy this appointment");
+    }
+
+    // only allow if the status is pending
+    if(appointment.status !== "PENDING"){
+        throw new Error("only pending appointments can be approved/rejected");
+
+    }
+
+    if(!["Approve", "Reject"].includes(status)){
+        throw new Error("Invalid status");
+    }
+
+    return await updateAppointmentDecisionRepo(appointmentId,status);
+
 };
 
-//Approve appointment
+export const getPendingAppointmentService = async(doctorId) => {
+    return await getPendingAppointmentRepo(doctorId);
 
-export const approveAppointment = async (appointmnetId) =>{
-    const res = await axios.patch(`${APPOINTMENT_SERVICE_URL}/${appointmnetId}/status`,{
-        status: "Approve",
-    });
-    return res.data;
-};
-
-// Reject appointment
-export const rejectAppointment = async (appointmnetId) =>{
-    const res = await axios.patch(`${APPOINTMENT_SERVICE_URL}/${appointmnetId}/status`,{
-        status: "Reject",
-    });
-    return res.data;
-};
-
+}
+ 
 //fetch all appointmnets for a doctor
-export const getDoctorAppointments = async (doctorId) =>{
-    const res = await axios.get(`${APPOINTMENT_SERVICE_URL}/doctor/${doctorId}`);
+// export const getDoctorAppointments = async (doctorId) =>{
+//     const res = await axios.get(`${APPOINTMENT_SERVICE_URL}/doctor/${doctorId}`);
      
-    return res.data;
-};
+//     return res.data;
+// };

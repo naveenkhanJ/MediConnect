@@ -1,5 +1,5 @@
 import express from "express";
-import { decideAppointment, fetchPendingAppointments } from "../controllers/appointmentStatus.controller.js";
+import { decideAppointmentController, fetchPendingAppointments } from "../controllers/appointmentStatus.controller.js";
 
 const router = express.Router();
 
@@ -7,6 +7,6 @@ const router = express.Router();
 router.get("/appointments/pending",fetchPendingAppointments);
 
 //approve/reject appointment
-router.patch("/appointments/decision",decideAppointment);
+router.patch("/appointments/:appointmentId/decision",decideAppointmentController);
 
 export default router; 
