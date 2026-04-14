@@ -1,6 +1,6 @@
 import { getPatientReport } from "../services/report.service.js";
-import { getDoctorAppointments } from "../services/appointmentStatus.service.js";
-
+//import { getDoctorAppointments } from "../services/appointmentStatus.service.js";
+import { AppointmentProvider } from "../providers/appointment.provider.js";
 //get reports
 export const fetchPatientReport = async (req,res) => {
     try{
@@ -8,8 +8,8 @@ export const fetchPatientReport = async (req,res) => {
         const {patientId} = req.params;
 
 
-        const appointmenets = await getDoctorAppointments(doctorId);
-        
+        //const appointmenets = await getDoctorAppointments(doctorId);
+        const appointmenets = await AppointmentProvider.getPendingAppointments(req.user.id);
         const patientAppointment = appointmenets.find(
            ( appt) => String(appt.patientId) == String(patientId)
         );
