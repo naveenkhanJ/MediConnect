@@ -1,16 +1,18 @@
-import { createPrescriptionService, generatePrescriptionPDFService, getAllPrescriptionService, getPatientPrescriptionsService } from "../services/prescription.service.js";
+import { createPrescriptionService, generatePrescriptionPDFService, getDoctorPrescriptionsService, getPatientPrescriptionsService } from "../services/prescription.service.js";
+import { AppointmentProvider } from "../providers/appointment.provider.js";
+
 
 //doctor create prescription
 export const createPrescriptionController = async (req ,res) =>{
-
+ const appointment = await AppointmentProvider.getAppointmentById(id);
     try{
+        
         const doctorId = req.user.id;
-        const {appointmentId, patientId,medications , notes } = req.body;
+        const {appointmentId,medications , notes } = req.body;
 
         const prescription = await createPrescriptionService({
             appointmentId,
             doctorId,
-            patientId,
             medications,
             notes,
         });
@@ -29,7 +31,7 @@ export const  getAllPrescriptionsController = async (req,res) =>{
         }
 
         const doctorId = req.user.id;
-        const prescriptions = await getAllPrescriptionService(doctorId);
+        const prescriptions = await getDoctorPrescriptionsService(doctorId);
         res.json(prescriptions);
     }catch(err){
         res.status(403).json({message: err.message});
@@ -46,7 +48,7 @@ export const getPatientPrescriptionController = async (req,res) => {
         );
          res.json(prescriptions);
     }catch(err){
-        res.status(403).json({message: err.message});
+        res.status(500).json({message: err.message});
     }
 };
 
@@ -63,6 +65,6 @@ export const downloadPrescriptionPDFController = async(req,res) => {
        res.setHeader("Content-Length", pdfBuffer.length);
          res.end(pdfBuffer);
     }catch(err){
-        res.status(403).json({message: err.message});
+        res.status(500).json({message: err.message});
     }
 }
