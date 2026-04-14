@@ -1,34 +1,43 @@
-import { getDoctorProfileService, updateDoctorProfileService } from "../services/doctorProfile.service.js";
+import { createProfileService, getProfileService, updateProfileService } from "../services/doctorProfile.service.js";
 
+//create profile
+export const createProfileController = async(req,res) =>{
+    try{
+        const doctorId= req.user.id;
 
+        const profile = await createProfileService(doctorId, req.body);
+
+        res.status(201).json(profile);
+
+    }catch(err){
+        res.status(400).json({message: err.message});
+    }
+};
 //get pwn profile
-export const getDoctorProfileController = async(req ,res) =>{
+export const getProfileController = async(req ,res) =>{
     try{
         const doctorId = req.user.id;
 
-        if(req.user.role !== "doctor"){
-             return res.status(403).json({message: "Only doctors can access the profile"});
-        }
+        const profile = await getProfileService(doctorId);
 
-        const profile = await getDoctorProfileService(doctorId);
-        res.json(profile);
+        // if(req.user.role !== "doctor"){
+        //      return res.status(403).json({message: "Only doctors can access the profile"});
+        // }
+        res.status(200).json(profile);
     }catch(err){
          res.status(500).json({message: err.message});
     }
 };
 
 //update own profile
-export const updateDoctorProfileController = async(req ,res) =>{
+export const updateProfileController = async(req ,res) =>{
     try{
         const doctorId = req.user.id;
 
-        if(req.user.role !== "doctor"){
-             return res.status(403).json({message: "Only doctors can update the profile"});
-        }
+        const updated = await updateProfileService(doctorId, req.body);
 
-        const updatedprofile = await updateDoctorProfileService(doctorId,req.body);
-        res.json(updatedprofile);
+        res.status(200).json(updated);
     }catch(err){
-         res.status(500).json({message: err.message});
+         res.status(400).json({message: err.message});
     }
 };
