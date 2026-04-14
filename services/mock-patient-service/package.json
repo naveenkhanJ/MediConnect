@@ -1,19 +1,17 @@
 {
-  "name": "api-gateway",
+  "name": "mock-patient-service",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "mock-patient-service.js",
+  "type": "module",
   "scripts": {
+    "start": "node mock-patient-service.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "description": "",
   "dependencies": {
-    "axios": "^1.14.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.1",
     "express": "^5.2.1"
-  },
-  "description": ""
+  }
 }
