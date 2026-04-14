@@ -1,6 +1,7 @@
-import Prescription from "../models/prescription.model.js";
-import axios from "axios";
+
 import PDFDocument from "pdfkit";
+import { PrescriptionRepository } from "../repositories/prescription.repository.js";
+//import { getAppointmentByIdRepo } from "../repositories/appointmentStatus.repository.js";
 
 // create prscription
 export const createPrescriptionService = async({
@@ -10,8 +11,8 @@ export const createPrescriptionService = async({
     notes,
 }) => {
 
-    const appointmentRes = await axios.get(`http://localhost:5001/api/appointments/${appointmentId}`);
-    const appointment = appointmentRes.data;
+    const appointment = await getAppointmentByIdRepo(appointmentId);
+   
 
     if(appointment.doctorId !== doctorId){
         throw new Error("Unauthorized: You are not the doctor for this appointment");
@@ -19,7 +20,7 @@ export const createPrescriptionService = async({
 
     const patientId = appointment.patientId;
 
-    return Prescription.create({
+    return await  PrescriptionRepository.create({
     appointmentId,
     doctorId,
     patientId,
@@ -28,17 +29,14 @@ export const createPrescriptionService = async({
     });
 };
 
-//Get all prescription
-export const getAllPrescriptionService = async (doctorId) => {
+//doctor prescription
+export const getDoctorPrescriptionsService = async (doctorId) => {
     //check authorization
 
     if(!doctorId){
         throw new Error("Unauthorized: Doctor ID is required");
     }
-    return Prescription.findAll({
-        where: {doctorId},
-        order: [["createdAt","DESC"]],
-    });
+    return await PrescriptionRepository.findByDoctorId(doctorId);
 };
 
 //Get  prescription for a patient
@@ -48,77 +46,77 @@ export const getPatientPrescriptionsService = async (patientId,user) =>{
         throw new Error("Unauthorized: You can only see your prescription");
     }
    
-    return Prescription.findAll({
-        where:{ patientId},
-        order: [["createdAt","DESC"]]
-    });
+    return await PrescriptionRepository.findByPatientId(patientId);
 };
 
+//get by id
+export const getPrescriptionByIdService = async(id) => {
+    const prescription = await PrescriptionRepository.findById(id);
+    
+    if (!prescription) throw new Error("Not found");
+    return prescription;
+}
 
 // generate PDF
-export const generatePrescriptionPDFService = async (prescriptionId,user) =>{
-    
-    const prescription = await Prescription.findByPk(prescriptionId);
-    if(!prescription)
-        throw new Error ("Prescription not found");
+export const generatePrescriptionPDFService = async (id, user) => {
 
-    //only the doctor and the patient can generate PDF
-    if(user.role === "DOCTOR" && prescription.doctorId !== user.id){
-        throw new Error("Unauthorized: you can not access the prescription");
+    const prescription = await PrescriptionRepository.findById(id);
 
+    if (!prescription) throw new Error("Not found");
+
+    if (
+        user.role === "DOCTOR" &&
+        prescription.doctorId !== user.id
+    ) {
+        throw new Error("Unauthorized");
     }
 
-    if(user.role === "PATIENT" && prescription.patientId !== user.id){
-        throw new Error("Unauthorized: you can not access the prescription");
-        
+    if (
+        user.role === "PATIENT" &&
+        prescription.patientId !== user.id
+    ) {
+        throw new Error("Unauthorized");
     }
 
-    //get doctor info 
-    // const doctorRes = await axios.get(`http://localhost:5009/api/doctors/${prescription.doctorId}`);
-    // const doctor = doctorRes.data;
+    // mock doctor/patient (replace with provider later)
     const doctor = {
-  id: prescription.doctorId,
-  name: "Dr. John Doe",
-  specialty: "General Medicine",
-};
-
-    // get patient info
-    // const patientRes = await axios.get(`http://localhost:4000/patients/${prescription.patientId}`);
-    // const patient = patientRes.data;
-     const patient = {
-        id: prescription.patientId,
-        name: "Patient Name",
-        age: 30,
-        gender: "Not specified",
+        name: "Dr. John Doe",
+        specialty: "General Medicine"
     };
 
-    return new Promise((resolve,reject) =>{
-    const doc = new PDFDocument();
-    const buffers = [];
-    doc.on("data", buffers.push.bind(buffers));
-    doc.on("end", () =>{
-        resolve(Buffer.concat(buffers));
-    })
+    const patient = {
+        name: "Patient Name"
+    };
 
-    doc.fontSize(20).text("Digital Prescription", { align: "center" });
-    doc.moveDown();
-     doc.fontSize(12).text(`Doctor: ${doctor.name} (${doctor.specialty || ""})`);
-    doc.text(`Patient: ${patient.name}`);
-    doc.text(`Appointment ID: ${prescription.appointmentId}`);
-    doc.text(`Date: ${prescription.createdAt.toDateString()}`);
-    doc.moveDown();
+    return new Promise((resolve) => {
+        const doc = new PDFDocument();
+        const buffers = [];
 
-    doc.text("Medications:");
-     prescription.medications.forEach((med, i) => {
-    doc.text(`${i + 1}. ${med.name} - ${med.dose} - ${med.duration}`);
+        doc.on("data", buffers.push.bind(buffers));
+
+        doc.on("end", () => {
+            resolve(Buffer.concat(buffers));
+        });
+
+        doc.fontSize(20).text("Prescription", { align: "center" });
+        doc.moveDown();
+
+        doc.text(`Doctor: ${doctor.name}`);
+        doc.text(`Patient: ${patient.name}`);
+        doc.text(`Appointment: ${prescription.appointmentId}`);
+
+        doc.moveDown();
+        doc.text("Medications:");
+
+        prescription.medications.forEach((m, i) => {
+            doc.text(`${i + 1}. ${m.name} - ${m.dose}`);
+        });
+
+        if (prescription.notes) {
+            doc.moveDown();
+            doc.text(`Notes: ${prescription.notes}`);
+        }
+
+        doc.end();
     });
-
-    if (prescription.notes) {
-    doc.moveDown();
-    doc.text(`Notes: ${prescription.notes}`);
-   }
-
-  doc.end();
-  
-  });
 };
