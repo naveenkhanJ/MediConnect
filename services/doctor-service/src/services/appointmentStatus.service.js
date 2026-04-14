@@ -19,7 +19,7 @@ export const handleAppointmentDesicionService = async ({
     }
 
     //ensure doctor owns appointment
-    if(appointment.dactorId !== doctorId){
+    if(appointment.doctorId !== doctorId){
         throw new Error("You are not allowed to modfy this appointment");
     }
 
