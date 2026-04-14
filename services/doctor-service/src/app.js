@@ -24,7 +24,7 @@ app.use("/api/prescriptions",prescriptionRoutes);
 //patient report
 app.use("/api/reports",reportRoutes);
 //manage profile
-app.use("/api/profile",profileRoutes);
+app.use("/api/profile",fakeAuth,profileRoutes);
 //conduct video session
 app.use("/api/telemedicine",telemedicineRoutes);
 
