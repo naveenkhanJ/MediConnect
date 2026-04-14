@@ -10,4 +10,3 @@ router.get("/appointments/pending",getPendingAppointmentsController);
 router.patch("/appointments/:appointmentId/decision",decideAppointmentController);
 
 export default router; 
-
