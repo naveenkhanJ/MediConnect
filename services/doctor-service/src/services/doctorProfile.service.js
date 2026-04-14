@@ -1,30 +1,44 @@
-import axios from "axios";
+import { doctorProfileRepository } from "../repositories/doctorProfile.repository.js";
 
-const DOCTOR_SERVICE_URL = "https://localhost:5008/api/doctors";
+//create profile
+export const createProfileService = async(doctorId, data) =>{
+    const existing = await doctorProfileRepository.findByDoctorId(doctorId);
 
-// get doctor profile
-// export const getDoctorProfileService = async(doctorId) => {
-//     const res = await axios.get(`${DOCTOR_SERVICE_URL}/${doctorId}`);
-//     return res.data;
-// };
-export const getDoctorProfileService = async (doctorId) => {
-    //  Mock data instead of axios
-    return {
-        id: doctorId,
-        name: "Dr. John Doe",
-        specialty: "Cardiology",
-        experience: "5 years",
-        email: "doctor@gmail.com"
-    };
+    if (existing)
+        throw new Error ("Profile already exists");
+
+    return await doctorProfileRepository.create({
+    doctorId,
+    ...data,
+    isVerified: false
+    });
 };
 
-// update doctor profile
-export const updateDoctorProfileService = async(doctorId,data) => {
-  //  const res = await axios.put(`${DOCTOR_SERVICE_URL}/${doctorId}`,data);
-   // return res.data;
-   return {
-        id: doctorId,
-        ...data,   // merge updated fields
-        message: "Profile updated successfully"
-    };
+
+
+// get doctor profile
+export const getProfileService = async(doctorId) => {
+   const profile = await doctorProfileRepository.findByDoctorId(doctorId);
+
+   if (!profile)
+        throw new Error ("Profile not found");
+
+    return profile;
+ };
+
+
+// update doctor profile(partilay re-verification logic)
+export const updateProfileService = async(doctorId,data) => {
+    const profile = await doctorProfileRepository.findByDoctorId(doctorId);
+
+     if (!profile)
+        throw new Error ("Profile not found");
+
+      //remove immutable field
+      delete data.speciality;
+      delete data.licenseNumber;
+      
+
+    return await doctorProfileRepository.updateDoctorById(doctorId,data);
+
 };
