@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import { AppointmentProvider } from "../providers/appointment.provider.js";
 
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL;
