@@ -29,7 +29,12 @@ export const addAvailabilityController = async (req, res) => {
 export const updateAvailabilityController = async (req, res) => {
 
     try{
-        const slot = await updateAvailabilityService(req.params.id, req.body);
+        const slot = await updateAvailabilityService(req.params.id, 
+            {
+                doctorId:req.user.id,
+                ...req.body
+            }
+        ); 
         res.json(slot);
     }catch(err){
         res.status(400).json({message:err.message});

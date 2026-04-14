@@ -34,7 +34,7 @@ export const addAvailabilityService = async ({ doctorId, date, startTime, endTim
 };
 
 //update a slot
-export const updateAvailabilityService = async (id, { date, startTime, endTime}) => {
+export const updateAvailabilityService = async (id, {doctorId, date, startTime, endTime}) => {
 
     const slot = await findAvailabilityById(id);
     if(!slot){
@@ -50,7 +50,8 @@ export const updateAvailabilityService = async (id, { date, startTime, endTime})
             doctorId,
             date,
             startTime,
-            endTime
+            endTime,
+            id
     );
 
     if(existing){
