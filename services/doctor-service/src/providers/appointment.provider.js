@@ -5,9 +5,9 @@ const BASE_URL = process.env.APPOINTMENT_SERVICE_URL;
 export const AppointmentProvider = {
 
     //get appointment by ID
-    getAppointmentByid: async (appointmentId) => {
+    getAppointmentById: async (appointmentId) => {
     const res = await axios.get(
-       ` ${BASE_URL}/${appointmentId}`
+       `${BASE_URL}/${appointmentId}`
     );
     return res.data;
     },

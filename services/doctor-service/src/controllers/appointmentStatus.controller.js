@@ -1,10 +1,10 @@
-import { approveAppointment, getPendingAppointmentsService, handleAppointmentDesicionService, rejectAppointment } from "../services/appointmentStatus.service.js";
+import { getPendingAppointmentService, handleAppointmentDesicionService } from "../services/appointmentStatus.service.js";
 
 //fetch pending appointmets for logged doctor
 export const getPendingAppointmentsController = async (req,res) => {
     try{
         const doctorId = req.user.id;
-        const appointmenets = await getPendingAppointmentsService(doctorId);
+        const appointmenets = await getPendingAppointmentService(doctorId);
         res.status(200).json(appointmenets);
     }catch(err){
         res.status(500).json({message: err.message});
