@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAppointmentByid, getAppointmentByIdRepo, getPendingAppointmentRepo, updateAppointmentDecisionRepo } from "../repositories/appointmentStatus.repository";
+import { getAppointmentByIdRepo, getPendingAppointmentRepo, updateAppointmentDecisionRepo } from "../repositories/appointmentStatus.repository.js";
 
 
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL;
