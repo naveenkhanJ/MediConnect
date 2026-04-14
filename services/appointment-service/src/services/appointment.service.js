@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   createAppointment,
   findAppointmentByDoctorDateSlot,
@@ -5,6 +6,7 @@ import {
   updateAppointment,
   findAppointmentsByPatientId
 } from "../repositories/appointment.repository.js";
+
 import {
   getDoctorById,
   searchDoctorsBySpecialty
