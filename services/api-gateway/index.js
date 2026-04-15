@@ -5,6 +5,8 @@ import cors from 'cors';
 const app = express();
 app.use(cors());
 app.use(express.json());
+// PayHere sends notify as application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 // ─── MOCK LOGIN (used when patient service is not running) ────────────────────
 // Remove this route once the patient service is integrated
@@ -170,13 +172,18 @@ app.get('/api/payments/appointment/:appointmentId', async (req, res) => {
 });
 
 // PayHere notify webhook (PayHere calls this after payment)
-// PayHere calls: POST /api/payments/payhere-notify
+// PayHere sends form-urlencoded — forward it as-is using URLSearchParams
 app.post('/api/payments/payhere-notify', async (req, res) => {
   try {
-    const response = await axios.post(`http://localhost:5004/api/payments/payhere-notify`, req.body);
-    res.json(response.data);
+    const params = new URLSearchParams(req.body).toString();
+    const response = await axios.post(
+      `http://localhost:5004/api/payments/payhere-notify`,
+      params,
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+    res.status(response.status).send(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).send(err.response?.data || "Error");
   }
 });
 

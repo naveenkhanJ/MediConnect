@@ -31,13 +31,23 @@ export default function PaymentPage() {
     // Call the payment service (via gateway) to get PayHere form fields + hash
     // The hash must be generated server-side to keep merchant secret safe
     fetch(`http://localhost:4000/api/payments/payhere-params/${payment.id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(err.message || "Failed to load payment details.");
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!data.amount || !data.hash) {
+          throw new Error("Invalid payment data received from server.");
+        }
         setPaymentData(data);
         setLoading(false);
       })
-      .catch(() => {
-        setError("Failed to load payment details.");
+      .catch((err) => {
+        setError(err.message || "Failed to load payment details.");
         setLoading(false);
       });
   }, []);
