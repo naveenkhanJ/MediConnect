@@ -1,0 +1,25 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "SMS + Email notification microservice for MediConnect",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.9",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.20.0",
+    "nodemailer": "^6.10.1",
+    "sequelize": "^6.37.8",
+    "twilio": "^5.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
+
