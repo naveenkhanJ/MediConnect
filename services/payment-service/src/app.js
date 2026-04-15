@@ -6,6 +6,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+// PayHere sends notify as application/x-www-form-urlencoded (not JSON)
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/payments", paymentRoutes);
 
