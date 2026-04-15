@@ -8,48 +8,65 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState("verifying"); // "verifying" | "confirmed" | "timeout"
 
   useEffect(() => {
-    const stored = localStorage.getItem("pendingAppointment");
-    if (!stored) {
+    const storedAppt = localStorage.getItem("pendingAppointment");
+    const storedPayment = localStorage.getItem("pendingPayment");
+
+    if (!storedAppt) {
       setStatus("confirmed");
       return;
     }
 
-    const appt = JSON.parse(stored);
+    const appt = JSON.parse(storedAppt);
     setAppointment(appt);
 
-    // Poll the appointment status endpoint up to 8 times (8 seconds)
-    // PayHere's notify_url is called server-to-server while the browser is redirected,
-    // so there can be a short delay before the DB is updated.
-    let attempts = 0;
-    const maxAttempts = 8;
+    const confirmPayment = async () => {
+      // If we have the payment record, call mark-success directly.
+      // This handles the case where PayHere's notify_url webhook hasn't fired yet
+      // (e.g. ngrok not running in development).
+      if (storedPayment) {
+        try {
+          const payment = JSON.parse(storedPayment);
+          await fetch(`http://localhost:4000/api/payments/${payment.id}/success`, {
+            method: "PUT",
+          });
+        } catch {
+          // ignore — will fall back to polling below
+        }
+      }
 
-    const poll = async () => {
-      try {
-        const res = await fetch(`http://localhost:4000/api/appointments/${appt.id}/status`);
-        const data = await res.json();
+      // Poll until appointment status is CONFIRMED (up to 8 seconds)
+      let attempts = 0;
+      const maxAttempts = 8;
 
-        if (data.status === "CONFIRMED") {
-          setStatus("confirmed");
+      const poll = async () => {
+        try {
+          const res = await fetch(`http://localhost:4000/api/appointments/${appt.id}/status`);
+          const data = await res.json();
+
+          if (data.status === "CONFIRMED") {
+            setStatus("confirmed");
+            localStorage.removeItem("pendingPayment");
+            localStorage.removeItem("pendingAppointment");
+            return;
+          }
+        } catch {
+          // ignore fetch errors during polling
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 1000);
+        } else {
+          setStatus("timeout");
           localStorage.removeItem("pendingPayment");
           localStorage.removeItem("pendingAppointment");
-          return;
         }
-      } catch {
-        // ignore fetch errors during polling
-      }
+      };
 
-      attempts++;
-      if (attempts < maxAttempts) {
-        setTimeout(poll, 1000);
-      } else {
-        // Notify was likely delayed — still show success but with a note
-        setStatus("timeout");
-        localStorage.removeItem("pendingPayment");
-        localStorage.removeItem("pendingAppointment");
-      }
+      poll();
     };
 
-    poll();
+    confirmPayment();
   }, []);
 
   return (

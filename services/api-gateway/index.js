@@ -5,7 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Service URLs — use env vars in Docker, fall back to localhost for local dev
-const PATIENT_SERVICE     = process.env.PATIENT_SERVICE_URL     || 'http://localhost:5000';
+const AUTH_SERVICE        = process.env.AUTH_SERVICE_URL        || 'http://localhost:5000';
+const PATIENT_SERVICE     = process.env.PATIENT_SERVICE_URL     || 'http://localhost:5002';
 const APPOINTMENT_SERVICE = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:5003';
 const PAYMENT_SERVICE     = process.env.PAYMENT_SERVICE_URL     || 'http://localhost:5004';
 
@@ -21,7 +22,7 @@ app.post('/auth/login', async (req, res) => {
   console.log("LOGIN ROUTE HIT");
 
   try {
-    const response = await axios.post(`${PATIENT_SERVICE}/api/patients/login`, req.body);
+    const response = await axios.post(`${AUTH_SERVICE}/api/auth/login`, req.body);
     res.json(response.data);
   } catch (err) {
     console.log("ERROR:", err.response?.data || err.message);
@@ -34,7 +35,7 @@ app.post('/auth/login', async (req, res) => {
 //register
 app.post('/auth/register', async (req, res) => {
   try {
-    const response = await axios.post(`${PATIENT_SERVICE}/api/patients/register`, req.body);
+    const response = await axios.post(`${AUTH_SERVICE}/api/auth/register`, req.body);
     res.json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(err.response?.data);

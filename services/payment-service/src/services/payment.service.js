@@ -51,7 +51,7 @@ export const markPaymentSuccessService = async (paymentId, transactionId = null)
   }
 
   if (payment.status === "SUCCESS") {
-    throw new Error("Payment already marked as success");
+    return payment; // already confirmed, idempotent
   }
 
   payment.status = "SUCCESS";
