@@ -84,7 +84,7 @@ export const getPayhereParamsController = async (req, res) => {
       merchant_id: merchantId,
       return_url: "http://localhost:3000/payment/success",
       cancel_url: "http://localhost:3000/payment/cancel",
-      notify_url: "http://localhost:4000/api/payments/payhere-notify",
+      notify_url: "https://procurer-speed-shading.ngrok-free.dev",
       order_id: payment.id,
       items: "Doctor Consultation",
       amount: amountFormatted,
