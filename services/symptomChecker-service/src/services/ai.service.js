@@ -1,40 +1,22 @@
-import axios from "axios";
-import 'dotenv/config';
-
-const HUGGINGFACE_TOKEN =process.env.HUGGINGFACE_TOKEN;
-   
+import { getAIResponse } from "../repository/ai.repository.js";
 
 export const analyzeSymptoms = async (symptoms) => {
-    try{
+    const response = await getAIResponse(symptoms);
 
-         const resp = await axios.post(
-            "https://api-inference.huggingface.co/models/gpt2",
-           
-            {inputs:`Patient symptoms: ${symptoms}.Give general advice`},
-            {
-                headers:{
-                    Authorization:`Bearer ${HUGGINGFACE_TOKEN}`
-                }
-            }
-            
-         );
-         return {
-             
-            possibleConditions: ["Example condition"],  
-            severity: "Low",                             
-            recommendedSpecialties: ["General Physician"], 
-            advice: resp.data[0]?.generated_text || "Consult a doctor"
-         };
-    }catch(err){
-        console.error("Hugging Face API error:", err.message);
-        return{
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    try {
+        // Gemini returns text 
+        const parsed = JSON.parse(text);
+
+        return parsed;
+
+    } catch (err) {
+        return {
             possibleConditions: [],
-            severity: "Low",
+            severity: "Unknown",
             recommendedSpecialties: ["General Physician"],
-            advice: "Could not generate advice. Consult a doctor."
-        }
+            advice: text || "Consult a doctor"
+        };
     }
-   
-    
-
 };

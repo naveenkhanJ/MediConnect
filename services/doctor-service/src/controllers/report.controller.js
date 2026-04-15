@@ -5,7 +5,7 @@ import { AppointmentProvider } from "../providers/appointment.provider.js";
 export const fetchPatientReport = async (req,res) => {
     try{
         const doctorId = req.user.id;
-        const {patientId} = req.params;
+        const {appointmentId} = req.params;
 
 
         //const appointmenets = await getDoctorAppointments(doctorId);
