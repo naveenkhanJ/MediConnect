@@ -27,6 +27,12 @@ export const AppointmentProvider = {
     );
     return res.data;
 
-    }
+    },
+     getDoctorAppointments: async (doctorId) => {
+    const res = await axios.get(
+      `${BASE_URL}/doctor/${doctorId}`
+    );
+    return res.data;
+  }
     
 };

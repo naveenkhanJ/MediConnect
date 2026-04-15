@@ -4,8 +4,9 @@ import availabilityRoute from "./routes/availability.routes.js";
 import appointmentRoute from "./routes/appointmentStatus.routes.js";
 import prescriptionRoutes from "./routes/prescription.routes.js";
 import reportRoutes from "./routes/report.routes.js";
-import profileRoutes from "./routes/doctorProfile.routes.js"
-import telemedicineRoutes from "./routes/doctorTelemedicine.route.js"
+import profileRoutes from "./routes/doctorProfile.routes.js";
+import telemedicineRoutes from "./routes/telemedicine.routes.js";
+import getDashboardSummaryRoutes from "./routes/dashboard.route.js";
 import { fakeAuth } from "./middlewares/fakeAuth.js";
 const app = express();
 
@@ -27,6 +28,8 @@ app.use("/api/reports",reportRoutes);
 app.use("/api/profile",fakeAuth,profileRoutes);
 //conduct video session
 app.use("/api/telemedicine",telemedicineRoutes);
+//dashboard summary
+app.use("/api/dashboard",getDashboardSummaryRoutes);
 
 
 app.get("/doctor", (req, res) => {
