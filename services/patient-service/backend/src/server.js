@@ -14,11 +14,7 @@ app.use(express.json());
 
 app.use('/api/patients', patientRoutes);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
-
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => console.log(`patient Service running on ${PORT}`));
 
 

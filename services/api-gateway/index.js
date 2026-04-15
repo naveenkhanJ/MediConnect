@@ -11,23 +11,39 @@ const PORT = 4000;
 app.listen(PORT, () => console.log(`API Gateway running on port ${PORT}`));
 
 //login
-app.post('/patients/login', async (req, res) => {
+
+app.post('/auth/login', async (req, res) => {
   console.log("LOGIN ROUTE HIT");
 
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/patients/login',
+      'http://localhost:5000/api/auth/login', 
       req.body
     );
+
     res.json(response.data);
   } catch (err) {
-    console.log("ERROR:", err.message);
+    console.log("ERROR:", err.response?.data || err.message);
     res.status(err.response?.status || 500).json(
       err.response?.data || { message: "Server Error" }
     );
   }
 });
 
+//register 
+app.post('/auth/register', async (req, res) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/api/auth/register',
+      req.body
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data);
+  }
+});
+
+//get peteint by id
 app.get('/patients/:id', async (req, res) => {
   console.log("AUTH HEADER FROM CLIENT:", req.headers.authorization);
   try {
@@ -49,14 +65,7 @@ app.get('/patients/:id', async (req, res) => {
   }
 });
 
-app.post('/patients/register', async (req, res) => {
-  try {
-    const response = await axios.post(`http://localhost:5000/api/patients/register`, req.body);
-    res.json(response.data);
-  } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
-  }
-});
+
 
 
 //  PUT update a patient by ID
