@@ -48,12 +48,6 @@ export default function Navbar() {
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
 
-          <Link href="/book-appointment">
-            <button className="text-white px-6 py-2 cursor-pointer rounded-full text-sm font-medium bg-[#5F6FFF] hover:bg-[#4a5ce6] transition">
-              Make Appointment
-            </button>
-          </Link>
-
           <Link href="/Auth/login">
             <button className="text-primary font-medium cursor-pointer border border-[#5F6FFF] px-6 py-2 rounded-full text-sm hover:bg-[#f0f1ff] transition">
               Sign In
