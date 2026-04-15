@@ -6,48 +6,69 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ─── MOCK LOGIN (used when patient service is not running) ────────────────────
-// Remove this route once the patient service is integrated
-app.post('/mock/login', (req, res) => {
-  res.json({
-    token: 'mock-token-123',
-    patient: {
-      id: 'test-patient-001',
-      name: 'Test Patient',
-      email: req.body.email || 'test@mediconnect.com'
-    }
-  });
-});
+// Start API Gateway
+const PORT = 4000;
+app.listen(PORT, () => console.log(`API Gateway running on port ${PORT}`));
 
-// ─── PATIENT ROUTES ───────────────────────────────────────────────────────────
+//login
 
-app.post('/patients/login', async (req, res) => {
+app.post('/auth/login', async (req, res) => {
+  console.log("LOGIN ROUTE HIT");
+
   try {
-    const response = await axios.post(`http://localhost:5000/api/patients/login`, req.body);
+    const response = await axios.post(
+      'http://localhost:5000/api/auth/login', 
+      req.body
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    console.log("ERROR:", err.response?.data || err.message);
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
 
-app.post('/patients/register', async (req, res) => {
+//register 
+app.post('/auth/register', async (req, res) => {
   try {
-    const response = await axios.post(`http://localhost:5000/api/patients/register`, req.body);
+    const response = await axios.post(
+      'http://localhost:5000/api/auth/register',
+      req.body
+    );
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).json(err.response?.data);
   }
 });
 
+//get peteint by id
 app.get('/patients/:id', async (req, res) => {
+  console.log("AUTH HEADER FROM CLIENT:", req.headers.authorization);
   try {
-    const response = await axios.get(`http://localhost:5000/api/patients/${req.params.id}`);
+    const response = await axios.get(
+      `http://localhost:5000/api/patients/${req.params.id}`,
+           {
+        headers: {
+          Authorization: req.headers.authorization 
+        }
+      }
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    console.log("ERROR:", err.response?.data || err.message);
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
 
+
+
+
+//  PUT update a patient by ID
 app.put('/patients/:id', async (req, res) => {
   try {
     const response = await axios.put(`http://localhost:5000/api/patients/${req.params.id}`, req.body);
@@ -59,10 +80,20 @@ app.put('/patients/:id', async (req, res) => {
 
 app.delete('/patients/:id', async (req, res) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/api/patients/${req.params.id}`);
+    const response = await axios.delete(
+      `http://localhost:5000/api/patients/${req.params.id}`,
+      {
+        headers: {
+          Authorization: req.headers.authorization // 🔥 REQUIRED
+        }
+      }
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
 
@@ -227,6 +258,7 @@ app.post("/api/profile", async (req, res) => {
         },
       }
     );
+
     res.json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(
@@ -668,5 +700,5 @@ app.get("/api/doctors/search", async (req, res) => {
 });
 // ─── START SERVER ─────────────────────────────────────────────────────────────
 // app.listen must always be at the end, after all routes are registered
-const PORT = 4000;
-app.listen(PORT, () => console.log(`API Gateway running on port ${PORT}`));
+
+
