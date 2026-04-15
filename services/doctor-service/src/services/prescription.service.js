@@ -1,7 +1,7 @@
 
 import PDFDocument from "pdfkit";
 import { PrescriptionRepository } from "../repositories/prescription.repository.js";
-//import { getAppointmentByIdRepo } from "../repositories/appointmentStatus.repository.js";
+import { getAppointmentByIdRepo } from "../repositories/appointmentStatus.repository.js";
 
 // create prscription
 export const createPrescriptionService = async({

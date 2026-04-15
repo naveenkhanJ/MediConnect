@@ -1,22 +1,22 @@
 import { analyzeSymptoms } from "../services/ai.service.js";
 
-export const checkSymptoms = async (req, res) =>{
-     try{
-        const {symptoms} = req.body;
+export const checkSymptoms = async (req, res) => {
+    try {
+        const { symptoms } = req.body;
 
-        if(!symptoms){
-            return res.status(400).json({error:"symptoms are required"});
-            
+        if (!symptoms) {
+            return res.status(400).json({ error: "symptoms are required" });
         }
 
-        const aiResult = await analyzeSymptoms(symptoms);
+        const result = await analyzeSymptoms(symptoms);
 
-        res.json({
-            ...aiResult,
-            disclaimer: "This is not a medical diagnosis.Please consult a doctor"
+        return res.json({
+            success: true,
+            data: result,
+            disclaimer: "This is not a medical diagnosis. Please consult a doctor."
         });
-     }catch(error){
-        console.error(error);
-        res.status(500).json({error:"AI analysis failed"});
-     }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+    }
 };
