@@ -647,6 +647,25 @@ app.post("/api/symptoms/check", async (req, res) => {
     );
   }
 });
+
+// Search doctors by speciality
+// Frontend calls: GET /api/doctors/search?speciality=Cardiology
+app.get("/api/doctors/search", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${DOCTOR_SERVICE_URL}/api/profile/search`,
+      {
+        params: req.query
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
+  }
+});
 // ─── START SERVER ─────────────────────────────────────────────────────────────
 // app.listen must always be at the end, after all routes are registered
 const PORT = 4000;
