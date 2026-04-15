@@ -96,8 +96,14 @@ export default function PaymentSuccessPage() {
             )}
 
             <Link
+              href="/my-appointments"
+              className="block w-full bg-[#5F6FFF] text-white py-3 rounded-lg font-medium hover:opacity-90 transition mb-3"
+            >
+              View My Appointments
+            </Link>
+            <Link
               href="/"
-              className="block w-full bg-[#5F6FFF] text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
+              className="block w-full border border-gray-200 text-gray-600 py-3 rounded-lg font-medium hover:bg-gray-50 transition"
             >
               Go to Home
             </Link>

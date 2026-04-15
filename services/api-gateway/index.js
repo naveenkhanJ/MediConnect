@@ -98,11 +98,14 @@ app.get('/api/appointments/doctors/search', async (req, res) => {
 });
 
 // Get my appointments (requires auth header forwarding)
-// Frontend calls: GET /api/appointments/my/list
+// Frontend calls: GET /api/appointments/my/list with x-patient-id header
 app.get('/api/appointments/my/list', async (req, res) => {
   try {
     const response = await axios.get(`${APPOINTMENT_SERVICE}/api/appointments/my/list`, {
-      headers: { Authorization: req.headers.authorization }
+      headers: {
+        Authorization: req.headers.authorization,
+        'x-patient-id': req.headers['x-patient-id']
+      }
     });
     res.json(response.data);
   } catch (err) {
