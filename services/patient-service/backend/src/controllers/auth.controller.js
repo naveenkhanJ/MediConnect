@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db.js';
+import dotenv from "dotenv";
+dotenv.config();
 
-const jwtSecret = process.env.JWT_SECRET || 'supersecretkey';
+const jwtSecret = process.env.JWT_SECRET;
 
 const loginPatient = async (req, res) => {
   try {
