@@ -29,7 +29,7 @@ export default function Navbar() {
             ✨
           </div>
           <h1 className="text-xl font-semibold text-gray-800">
-            Prescripto
+            MediConnect
           </h1>
         </div>
 
@@ -87,7 +87,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/Auth/login">
-                <button className="text-primary font-medium cursor-pointer border border-[#5F6FFF] px-6 py-2 rounded-full text-sm hover:bg-[#f0f1ff] transition">
+                <button className="text-[#5F6FFF] font-medium cursor-pointer border border-[#5F6FFF] px-6 py-2 rounded-full text-sm hover:bg-[#f0f1ff] transition">
                   Sign In
                 </button>
               </Link>
