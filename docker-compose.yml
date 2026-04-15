@@ -1,0 +1,124 @@
+version: "3.8"
+
+# ─────────────────────────────────────────────────────────────
+#  MediConnect — docker-compose
+#  Covers: api-gateway, appointment-service, payment-service
+#  Other services (patient, doctor, symptomChecker, frontend)
+#  can be added by teammates using the same pattern.
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Databases ──────────────────────────────────────────────
+
+  appointment-db:
+    image: postgres:15-alpine
+    container_name: appointment-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: appointment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"       # host:container  (avoids clash with local postgres on 5432)
+    volumes:
+      - appointment_db_data:/var/lib/postgresql/data
+    networks:
+      - mediconnect-net
+
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5434:5432"
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - mediconnect-net
+
+  # ── Services ───────────────────────────────────────────────
+
+  appointment-service:
+    build:
+      context: ./services/appointment-service
+      dockerfile: Dockerfile
+    container_name: appointment-service
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
+    environment:
+      PORT: 5003
+      DB_HOST: appointment-db       # container name, NOT localhost
+      DB_PORT: 5432
+      DB_NAME: appointment_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      PAYMENT_SERVICE_URL: http://payment-service:5004
+      NODE_ENV: production
+    depends_on:
+      - appointment-db
+    networks:
+      - mediconnect-net
+
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: unless-stopped
+    ports:
+      - "5004:5004"
+    environment:
+      PORT: 5004
+      DB_HOST: payment-db           # container name, NOT localhost
+      DB_PORT: 5432
+      DB_NAME: payment_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      APPOINTMENT_SERVICE_URL: http://appointment-service:5003
+      # PayHere credentials — replace with your real sandbox values
+      PAYHERE_MERCHANT_ID: ${PAYHERE_MERCHANT_ID:-1235163}
+      PAYHERE_MERCHANT_SECRET: ${PAYHERE_MERCHANT_SECRET:-ODEwOTA3NTU5NzQ1OTYyMTkwOTI1NzMyNzAwMjU3NDE3ODgwOA==}
+      PAYHERE_NOTIFY_URL: ${PAYHERE_NOTIFY_URL:-https://procurer-speed-shading.ngrok-free.dev/api/payments/payhere-notify}
+      PAYHERE_RETURN_URL: http://localhost:3000/payment/success
+      PAYHERE_CANCEL_URL: http://localhost:3000/payment/cancel
+      NODE_ENV: production
+    depends_on:
+      - payment-db
+    networks:
+      - mediconnect-net
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      # Point to sibling containers using their service names
+      PATIENT_SERVICE_URL: http://patient-service:5000
+      APPOINTMENT_SERVICE_URL: http://appointment-service:5003
+      PAYMENT_SERVICE_URL: http://payment-service:5004
+    depends_on:
+      - appointment-service
+      - payment-service
+    networks:
+      - mediconnect-net
+
+# ── Volumes & Networks ─────────────────────────────────────
+
+volumes:
+  appointment_db_data:
+  payment_db_data:
+
+networks:
+  mediconnect-net:
+    driver: bridge

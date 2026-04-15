@@ -39,15 +39,15 @@ export default function Hero() {
           {/* Stats */}
           <div className="flex gap-4 pt-4">
             <div className="bg-gradient-to-r from-white to-[#f5f5f5] p-4 rounded-md">
-              <h2 className="text-3xl font-bold">35+</h2>
+              <h2 className="text-3xl font-bold text-gray-900">35+</h2>
               <p className="text-gray-500 text-sm">Certified specialists</p>
             </div>
             <div className="bg-gradient-to-r from-white to-[#f5f5f5] p-4 rounded-md">
-              <h2 className="text-3xl font-bold">12+</h2>
+              <h2 className="text-3xl font-bold text-gray-900">12+</h2>
               <p className="text-gray-500 text-sm">Years experience</p>
             </div>
             <div className="bg-gradient-to-r from-white to-[#f5f5f5] p-4 rounded-md">
-              <h2 className="text-3xl font-bold">10k+</h2>
+              <h2 className="text-3xl font-bold text-gray-900">10k+</h2>
               <p className="text-gray-500 text-sm">Care with services</p>
             </div>
           </div>
