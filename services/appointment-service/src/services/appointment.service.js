@@ -33,10 +33,6 @@ export const createAppointmentService = async ({
     throw new Error("Doctor not found");
   }
 
-  if (!doctor.availableSlots.includes(timeSlot)) {
-    throw new Error("Selected time slot is not available");
-  }
-
   const existing = await findAppointmentByDoctorDateSlot(
     doctorId,
     appointmentDate,
