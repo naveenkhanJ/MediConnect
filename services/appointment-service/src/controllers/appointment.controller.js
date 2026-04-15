@@ -7,6 +7,7 @@ import {
   getMyAppointmentsService,
   confirmPaymentService
 } from "../services/appointment.service.js";
+import { findAppointmentById, updateAppointment } from "../repositories/appointment.repository.js";
 
 export const searchDoctorsController = async (req, res) => {
   try {
@@ -94,6 +95,30 @@ export const confirmPaymentController = async (req, res) => {
 
     res.status(200).json({
       message: "Appointment confirmed after payment",
+      appointment
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const failPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const appointment = await findAppointmentById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found"
+      });
+    }
+
+    appointment.status = "CANCELLED";
+    await updateAppointment(appointment);
+
+    res.status(200).json({
+      message: "Appointment cancelled due to payment failure",
       appointment
     });
   } catch (error) {

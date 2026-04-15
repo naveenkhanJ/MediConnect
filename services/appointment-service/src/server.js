@@ -6,7 +6,7 @@ import { connectDB } from "./config/db.js";
 import sequelize from "./config/sequelize.js";
 import Appointment from "./models/appointment.model.js";
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5003;
 
 const startServer = async () => {
   try {

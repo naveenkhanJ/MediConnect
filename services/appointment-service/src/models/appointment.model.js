@@ -38,10 +38,6 @@ const Appointment = sequelize.define(
       allowNull: false,
       defaultValue: "ONLINE"
     },
-    meetingLink: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
     paymentId: {
       type: DataTypes.STRING,
       allowNull: true

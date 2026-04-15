@@ -13,6 +13,6 @@ app.post('/api/appointments/internal', (req, res) => {
   });
 });
 
-app.listen(5001, () => {
-  console.log("🚀 Mock Appointment Service running on port 5001");
+app.listen(5003, () => {
+  console.log("🚀 Mock Appointment Service running on port 5003");
 });

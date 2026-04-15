@@ -10,7 +10,10 @@ app.use(express.json());
 app.use("/api/appointments", appointmentRoutes);
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ service: "appointment-service", status: "ok" });
+  res.status(200).json({ 
+    service: "appointment-service", 
+    status: "ok" 
+  });
 });
 
 export default app;

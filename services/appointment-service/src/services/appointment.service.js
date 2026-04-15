@@ -6,11 +6,11 @@ import {
   updateAppointment,
   findAppointmentsByPatientId
 } from "../repositories/appointment.repository.js";
+
 import {
   getDoctorById,
   searchDoctorsBySpecialty
 } from "../providers/doctor.provider.js";
-import { generateJitsiMeetingLink } from "../utils/jitsi.util.js";
 
 export const searchDoctorsService = async (specialty) => {
   if (!specialty) {
@@ -31,10 +31,6 @@ export const createAppointmentService = async ({
 
   if (!doctor) {
     throw new Error("Doctor not found");
-  }
-
-  if (!doctor.availableSlots.includes(timeSlot)) {
-    throw new Error("Selected time slot is not available");
   }
 
   const existing = await findAppointmentByDoctorDateSlot(
@@ -156,10 +152,7 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
   appointment.status = "CONFIRMED";
   appointment.paymentId = paymentId;
 
-  if (appointment.consultationType === "ONLINE") {
-    appointment.meetingLink = generateJitsiMeetingLink(appointment.id);
-  }
-
+  
   await updateAppointment(appointment);
   return appointment;
 };
