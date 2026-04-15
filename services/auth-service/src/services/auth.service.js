@@ -1,36 +1,55 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import  pool from "../config/db.config.js";
+import { findUserByEmail, createUser } from "../models/user.model.js";
+import { generateToken } from "../utils/jwt.js";
 
 
 
-export const registerUser = async (data) => {
-  const { name, email, password, role } = data;
+export const registerService = async (email, password, role) => {
 
+  if (!email || typeof email !== "string") {
+    throw new Error("Email is required");
+  }
+
+  if (!password || typeof password !== "string") {
+    throw new Error("Password is required");
+  }
+
+  if (!role || typeof role !== "string") {
+    throw new Error("Role is required");
+  }
+
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
+    const err = new Error("User already exists");
+    err.statusCode = 409;
+    throw err;
+  }
+
+  // 🔥 HASH PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const result = await  pool.query(
-    "INSERT INTO users(name,email,password,role) VALUES($1,$2,$3,$4) RETURNING *",
-    [name, email, hashedPassword, role]
-  );
+  const user = await createUser(email, hashedPassword, role);
 
-  return result.rows[0];
-};
-
-export const loginUser = async (email, password) => {
-  const result = await  pool.query("SELECT * FROM users WHERE email=$1", [email]);
-
-  const user = result.rows[0];
-  if (!user) throw new Error("User not found");
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Invalid password");
-
-  const token = jwt.sign(
-    { userId: user.id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "15m" }
-  );
+  const token = generateToken(user);
 
   return { user, token };
+};
+
+
+
+export const loginService = async (email, password) => {
+
+  const user = await findUserByEmail(email);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Invalid password");
+  }
+
+  const token = generateToken(user);
+
+  return { token, user };
 };
