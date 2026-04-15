@@ -13,11 +13,36 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
-    // TODO: connect backend API
+
+    try {
+      // TODO: switch to /patients/login once patient service is integrated
+      const response = await fetch('http://localhost:4000/mock/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Login failed');
+        return;
+      }
+
+      // Save token and user to localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.patient));
+
+      // Redirect to home
+      window.location.href = '/';
+
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
+    }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4">

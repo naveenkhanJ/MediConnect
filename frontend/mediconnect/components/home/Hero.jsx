@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { DoctorSearch } from "@/components/home/SearchBar";
 import  GroupIcon  from "@/public/images/group_profiles.png";
 import hero from "@/public/images/hero.jpg"
@@ -28,9 +29,11 @@ export default function Hero() {
           </p>
 
           {/* Button */}
-          <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
-            Schedule an appointment
-          </button>
+          <Link href="/book-appointment">
+            <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
+              Schedule an appointment
+            </button>
+          </Link>
         
 
           {/* Stats */}

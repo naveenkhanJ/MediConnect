@@ -7,7 +7,8 @@ import {
   cancelAppointmentController,
   getAppointmentStatusController,
   getMyAppointmentsController,
-  confirmPaymentController
+  confirmPaymentController,
+  failPayment
 } from "../controllers/appointment.controller.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.put("/:id/cancel", fakeAuth, cancelAppointmentController);
 router.get("/:id/status", fakeAuth, getAppointmentStatusController);
 router.get("/my/list", fakeAuth, getMyAppointmentsController);
 router.put("/:id/confirm-payment", confirmPaymentController);
+router.put("/:id/fail-payment", failPayment);
 
 export default router;

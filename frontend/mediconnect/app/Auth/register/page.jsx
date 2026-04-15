@@ -18,10 +18,40 @@ export default function RegisterPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
-    // TODO: connect backend API
+
+    // Calculate age from birthday
+    const birthDate = new Date(form.birthday);
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+
+    try {
+      const response = await fetch('http://localhost:4000/patients/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          age: age,
+          gender: form.gender,
+          contact: form.phone   // backend expects 'contact', form uses 'phone'
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Registration failed');
+        return;
+      }
+
+      alert('Account created! Please login.');
+      window.location.href = '/Auth/login';
+
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
+    }
   };
 
   return (
