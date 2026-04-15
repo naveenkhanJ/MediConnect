@@ -43,7 +43,7 @@ export const getPaymentByAppointmentIdService = async (appointmentId) => {
   return payment;
 };
 
-export const markPaymentSuccessService = async (paymentId) => {
+export const markPaymentSuccessService = async (paymentId, transactionId = null) => {
   const payment = await findPaymentById(paymentId);
 
   if (!payment) {
@@ -55,7 +55,7 @@ export const markPaymentSuccessService = async (paymentId) => {
   }
 
   payment.status = "SUCCESS";
-  payment.transactionId = `TXN-${Date.now()}`;
+  payment.transactionId = transactionId || `TXN-${Date.now()}`;
   await updatePayment(payment);
 
   try {
