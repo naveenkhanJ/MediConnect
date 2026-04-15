@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { DoctorSearch } from "@/components/home/SearchBar";
+import  GroupIcon  from "@/public/images/group_profiles.png";
+import hero from "@/public/images/hero.jpg"
 export default function Hero() {
   return (
     <section className=" relative w-full min-h-screen bg-gradient-to-r from-[#EEF0FF] to-white flex items-center lg:px-20 md:px-16 px-6 ">
@@ -53,7 +55,7 @@ export default function Hero() {
 
           {/* Doctor Image */}
           <Image
-            src="/hero.jpg"
+            src={hero}
             alt="doctor"
             width={700}
             height={700}
@@ -65,12 +67,12 @@ export default function Hero() {
             <p className="text-md text
             -gray-500 font-bold">Latest visit Doctor</p>
 
-            <img
-              src="/images/group_profiles.png"
+            <Image
+              src={GroupIcon}
               width={80}
               height={50}
               className="rounded-full mt-2"
-              alt="doctor"
+              alt="group_icon"
               />
             <p className="text-sm text-gray-500 mt-2">Care with Services</p>
           </div>
