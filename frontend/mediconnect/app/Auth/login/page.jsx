@@ -17,8 +17,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      // TODO: switch to /patients/login once patient service is integrated
-      const response = await fetch('http://localhost:4000/mock/login', {
+      const response = await fetch('http://localhost:4000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -33,7 +32,7 @@ export default function LoginPage() {
 
       // Save token and user to localStorage
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.patient));
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       // Redirect to home
       window.location.href = '/';
