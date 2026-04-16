@@ -5,7 +5,11 @@ import {
   cancelAppointmentService,
   getAppointmentStatusService,
   getMyAppointmentsService,
-  confirmPaymentService
+  confirmPaymentService,
+  getAppointmentByIdService,
+  getDoctorPendingAppointmentsService,
+  handleDoctorDecisionService,
+  getDoctorTodayAppointmentsService
 } from "../services/appointment.service.js";
 import { findAppointmentById, updateAppointment } from "../repositories/appointment.repository.js";
 
@@ -123,5 +127,51 @@ export const failPayment = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getAppointmentByIdController = async (req, res) => {
+  try {
+    const appointment = await getAppointmentByIdService(req.params.id);
+    res.status(200).json(appointment);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const getDoctorPendingAppointmentsController = async (req, res) => {
+  try {
+    const appointments = await getDoctorPendingAppointmentsService(req.params.doctorId);
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const handleDoctorDecisionController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { doctorId, status } = req.body;
+
+    if (!doctorId || !status) {
+      return res.status(400).json({ message: "doctorId and status are required" });
+    }
+
+    const appointment = await handleDoctorDecisionService({ appointmentId: id, doctorId, status });
+    res.status(200).json({
+      message: `Appointment ${status.toLowerCase()} successfully`,
+      appointment
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getDoctorTodayAppointmentsController = async (req, res) => {
+  try {
+    const appointments = await getDoctorTodayAppointmentsService(req.params.doctorId);
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

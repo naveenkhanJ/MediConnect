@@ -225,10 +225,6 @@ app.get('/api/appointments/:id', async (req, res) => {
   }
 });
 
-
-
-
-
 // ─── PAYMENT ROUTES ───────────────────────────────────────────────────────────
 
 // Get PayHere form parameters (hash generated server-side)

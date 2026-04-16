@@ -7,8 +7,12 @@ import reportRoutes from "./routes/report.routes.js";
 import profileRoutes from "./routes/doctorProfile.routes.js";
 import telemedicineRoutes from "./routes/telemedicine.routes.js";
 import getDashboardSummaryRoutes from "./routes/dashboard.route.js";
+import publicDoctorRoutes from "./routes/publicDoctor.routes.js";
 import { fakeAuth } from "./middlewares/fakeAuth.js";
 const app = express();
+
+// Public doctor catalog routes (no auth)
+app.use("/api/doctors", publicDoctorRoutes);
 
 //fake auth
 app.use(fakeAuth);
