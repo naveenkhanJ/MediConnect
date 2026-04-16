@@ -24,6 +24,8 @@ export default function ProfileUpdatePage() {
     alert("Profile Updated Successfully!");
   };
 
+  http://localhost:4000/patients/:id
+
   return (
     <div className="min-h-screen  p-4  font-sans text-slate-700 mt-16 border border-gray-200">
       <div className="max-w-4xl bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">

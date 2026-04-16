@@ -9,6 +9,10 @@ const registerPatient = async (req, res) => {
   try {
     const { name, email, password, age,gender,contact } = req.body;
 
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ message: 'Password is required' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
