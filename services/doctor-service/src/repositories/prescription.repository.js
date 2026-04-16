@@ -14,12 +14,18 @@ export const PrescriptionRepository ={
     });
 },
      findByPatientId: async (patientId) => {
-         return await Prescription.findAll({
+         return await Prescription.findAll({ 
         where:{ patientId},
         order: [["createdAt","DESC"]]
     });
 },
-findById: async (id) =>{
+    findById: async (id) =>{
     return await Prescription.findByPk(id);
- }
+  },
+  
+     findOneByAppointmentId: async (appointmentId) => {
+    return await Prescription.findOne({
+        where: { appointmentId }
+    });
+}
 };

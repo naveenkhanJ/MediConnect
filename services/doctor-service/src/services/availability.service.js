@@ -8,7 +8,7 @@ export const getDoctorAvailabilityService = async (doctorId) => {
     return findAvailabilityByDoctorId(doctorId);
 };
 
-// Add ne slot
+// Add new slot
 
 export const addAvailabilityService = async ({ doctorId, date, startTime, endTime}) => {
 

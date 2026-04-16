@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mediconnect-config
+  namespace: mediconnect
+data:
+  NODE_ENV: "production"
+  DB_USER: "postgres"
+  DB_PORT: "5432"
+
+  # Appointment DB
+  APPOINTMENT_DB_HOST: "appointment-db"
+  APPOINTMENT_DB_NAME: "appointment_db"
+
+  # Payment DB
+  PAYMENT_DB_HOST: "payment-db"
+  PAYMENT_DB_NAME: "payment_db"
+
+  # Inter-service URLs (use k8s Service names)
+  APPOINTMENT_SERVICE_URL: "http://appointment-service:5003"
+  PAYMENT_SERVICE_URL: "http://payment-service:5004"
+
+  # PayHere URLs
+  PAYHERE_RETURN_URL: "http://localhost:3000/payment/success"
+  PAYHERE_CANCEL_URL: "http://localhost:3000/payment/cancel"

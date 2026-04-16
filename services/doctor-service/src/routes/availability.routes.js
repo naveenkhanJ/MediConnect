@@ -3,6 +3,8 @@ import { addAvailabilityController, deleteAvailabilityController, getAvailabilit
 import { fakeAuth } from "../middlewares/fakeAuth.js";
 const router = express.Router();
 
+
+// important add this middleware for this doctors actions requireVerifiedDoctor
 router.get("/",fakeAuth,getAvailabilityController);
 router.post("/",fakeAuth,addAvailabilityController);
 router.put("/:id",fakeAuth, updateAvailabilityController);

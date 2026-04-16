@@ -10,10 +10,16 @@ export const doctorProfileRepository = {
         return await Doctor.findOne({where:{doctorId}});
     },
 
+     findBySpeciality: async (speciality) => {
+    return await Doctor.findAll({
+        where: { speciality }
+    });
+     },
     updateDoctorById:async(doctorId, data) => {
         await Doctor.update(data, {
             where: {doctorId}
         });
         return await Doctor.findOne({where:{doctorId}});
-    }
+    },
+    
 };
