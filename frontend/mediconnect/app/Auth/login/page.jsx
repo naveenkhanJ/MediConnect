@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { useState } from "react";
 
@@ -13,34 +12,7 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch('http://localhost:4000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || 'Login failed');
-        return;
-      }
-
-      // Save token and user to localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      // Redirect to home
-      window.location.href = '/';
-
-    } catch (error) {
-      alert('Something went wrong. Please try again.');
-    }
-  };
+  
 
 
   return (
@@ -54,7 +26,7 @@ export default function LoginPage() {
         </h2>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form  className="flex flex-col gap-4">
 
           {/* Email */}
           <div>

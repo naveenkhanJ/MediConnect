@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import AppointmentList from "@/components/AppointmentList";
+import PatientProfile from "@/components/patient_profile";
+import Dashboard from "@/components/Patient_dashbord";
+
 
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("Appointment List");
@@ -14,9 +17,7 @@ export default function PatientDashboard() {
 
       {/* Content */}
       <div className="flex-1 bg-gray-100">
-        {activeTab === "Dashboard" && (
-          <div className="p-6">Dashboard Content</div>
-        )}
+        {activeTab === "Dashboard" && <Dashboard />}
 
         {activeTab === "Appointment List" && <AppointmentList />}
 
@@ -24,9 +25,7 @@ export default function PatientDashboard() {
           <div className="p-6">Messages Page</div>
         )}
 
-        {activeTab === "Profile Settings" && (
-          <div className="p-6">Profile Settings Page</div>
-        )}
+        {activeTab === "patient setting" && <PatientProfile />}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   CalendarDays,
   MessageSquare,
+  User,
   Settings,
   Heart,
   KeyRound,
@@ -14,8 +15,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   const menu = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Appointment List", icon: CalendarDays },
-    { name: "Messages", icon: MessageSquare },
-    { name: "patient_profile", icon: Settings },
+    { name: "patient setting", icon: Settings },
     { name: "Favourites", icon: Heart },
     { name: "Change Password", icon: KeyRound },
     { name: "Logout", icon: LogOut },

@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function RegisterPage() {
+  const [role, setRole] = useState("patient");
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,73 +14,87 @@ export default function RegisterPage() {
     address: "",
     gender: "",
     birthday: "",
+
+    // doctor fields
+    licenseNo: "",
+    category: "",
+    fees: "",
+    specialization: "",
+    experience: "",
+    image: null,
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    const { name, value, files } = e.target;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Calculate age from birthday
-    const birthDate = new Date(form.birthday);
-    const age = new Date().getFullYear() - birthDate.getFullYear();
-
-    try {
-      const response = await fetch('http://localhost:4000/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          password: form.password,
-          age: age,
-          gender: form.gender,
-          contact: form.phone,
-          role: 'patient'
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || 'Registration failed');
-        return;
-      }
-
-      alert('Account created! Please login.');
-      window.location.href = '/Auth/login';
-
-    } catch (error) {
-      alert('Something went wrong. Please try again.');
+    if (name === "image") {
+      setForm({ ...form, image: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4 py-10 mt-10">
       
       <div className="bg-white shadow-xl rounded-lg w-full max-w-2xl p-8">
-        
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Create Account
-        </h2>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 🔷 TOP HEADER */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-16 h-16 bg-[#EEF0FF] rounded-full flex items-center justify-center mb-2">
+            <span className="text-xl text-[#5F6FFF]">⚕️</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            MediConnect
+          </h2>
+          <p className="text-sm text-gray-500">
+            Doctor appointment management
+          </p>
+        </div>
+
+        {/* 🔷 ROLE CARDS */}
+        <div className="grid grid-cols-2 max-w-[300px]  mx-auto gap-8 mb-4">
+          
+          {/* Patient */}
+          <div
+            onClick={() => setRole("patient")}
+            className={`cursor-pointer border rounded-xl p-4 h-20 w-40 flex flex-col items-center gap-2 transition
+              ${
+                role === "patient"
+                  ? "border-[#5F6FFF] bg-[#EEF0FF]"
+                  : "bg-gray-50"
+              }`}
+          >
+            <span className="">👤</span>
+            <p className="font-medium">Patient</p>
+          </div>
+
+          {/* Doctor */}
+          <div
+            onClick={() => setRole("doctor")}
+            className={`cursor-pointer border rounded-xl p-4 flex h-20 w-40 flex-col items-center gap-2 transition
+              ${
+                role === "doctor"
+                  ? "border-[#5F6FFF] bg-[#EEF0FF]"
+                  : "bg-gray-50"
+              }`}
+          >
+            <span className="text-xl">🩺</span>
+            <p className="font-medium">Doctor</p>
+          </div>
+        </div>
+
+        {/* FORM */}
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Name */}
           <div>
             <label className="text-sm text-gray-600">Full Name</label>
             <input
-              type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="Enter your name"
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
@@ -86,13 +102,10 @@ export default function RegisterPage() {
           <div>
             <label className="text-sm text-gray-600">Email</label>
             <input
-              type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
@@ -100,13 +113,10 @@ export default function RegisterPage() {
           <div>
             <label className="text-sm text-gray-600">Phone</label>
             <input
-              type="tel"
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              placeholder="Enter your phone"
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
@@ -118,9 +128,7 @@ export default function RegisterPage() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="Enter password"
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
@@ -128,13 +136,10 @@ export default function RegisterPage() {
           <div className="md:col-span-2">
             <label className="text-sm text-gray-600">Address</label>
             <input
-              type="text"
               name="address"
               value={form.address}
               onChange={handleChange}
-              placeholder="Enter your address"
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
@@ -145,13 +150,11 @@ export default function RegisterPage() {
               name="gender"
               value={form.gender}
               onChange={handleChange}
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             >
               <option value="">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option>Male</option>
+              <option>Female</option>
             </select>
           </div>
 
@@ -163,30 +166,95 @@ export default function RegisterPage() {
               name="birthday"
               value={form.birthday}
               onChange={handleChange}
-              required
-              className="w-full mt-1 px-4 py-2 border rounded-lg  focus:ring-[#5F6FFF]"
+              className="w-full mt-1 px-4 py-2 border rounded-lg"
             />
           </div>
 
+          {/* 🔥 DOCTOR ONLY */}
+          {role === "doctor" && (
+            <>
+              <div>
+                <label className="text-sm text-gray-600">License No</label>
+                <input
+                  name="licenseNo"
+                  value={form.licenseNo}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Category</label>
+                <input
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Fees</label>
+                <input
+                  type="number"
+                  name="fees"
+                  value={form.fees}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Specialization</label>
+                <input
+                  name="specialization"
+                  value={form.specialization}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm text-gray-600">Experience</label>
+                <input
+                  name="experience"
+                  value={form.experience}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* 🖼️ IMAGE UPLOAD */}
+              <div className="md:col-span-2">
+                <label className="text-sm text-gray-600">
+                  Upload Profile Image
+                </label>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="w-full mt-1"
+                />
+              </div>
+            </>
+          )}
+
           {/* Button */}
           <div className="md:col-span-2">
-            <button
-              type="submit"
-              className="w-full bg-[#5F6FFF] text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
-            >
+            <button className="w-full bg-[#5F6FFF] text-white py-2 rounded-lg">
               Register
             </button>
           </div>
         </form>
 
-        {/* Login Link */}
+        {/* Login */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account?{" "}
-          <Link href="/Auth/login" className="text-[#5F6FFF] font-medium hover:underline">
+          <Link href="/Auth/login" className="text-[#5F6FFF] font-medium">
             Login
           </Link>
         </p>
-
       </div>
     </div>
   );
