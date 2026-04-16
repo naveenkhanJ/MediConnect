@@ -3,6 +3,11 @@ import { createProfileService, getProfileService, updateProfileService,getDoctor
 //create profile
 export const createProfileController = async(req,res) =>{
     try{
+      const data = {
+      ...req.body,
+      image: req.file ? req.file.originalname : null 
+    };
+
 
         const profile = await createProfileService(req.body);
 
