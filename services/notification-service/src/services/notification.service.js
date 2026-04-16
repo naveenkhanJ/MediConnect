@@ -41,6 +41,19 @@ export async function sendEmail({ to, subject, text }) {
   return { attempted: true, sent: true };
 }
 
+export async function sendWhatsapp({ to, body }) {
+  const client = buildTwilioClient();
+  if (!client) return { attempted: false, sent: false, reason: "twilio_not_configured" };
+
+  await client.messages.create({
+    from: `whatsapp:${env.twilioFrom}`,
+    to: `whatsapp:${to}`,
+    body,
+  });
+
+  return { attempted: true, sent: true };
+}
+
 export async function sendSms({ to, body }) {
   const client = buildTwilioClient();
   if (!client) return { attempted: false, sent: false, reason: "twilio_not_configured" };
@@ -153,39 +166,67 @@ export async function notifyAppointmentBooked(payload) {
     }
   }
 
-  const smsResult = [];
+  const phoneResult = [];
   if (patientPhone) {
-    const smsBody = meetingLink
+    const msgBody = meetingLink
       ? `MediConnect: appointment confirmed ${meetingLink}`
       : `MediConnect: appointment confirmed (#${appointmentId})`;
+    
+    let whatsappOk = false;
+    let fallbackToSms = false;
+
+    // 1. Try WhatsApp
     try {
-      const r = await sendSms({ to: patientPhone, body: smsBody });
-      const ok = Boolean(r?.sent);
-      smsResult.push({ to: patientPhone, ok, meta: r });
-      await persistLog({
-        channel: "SMS",
-        toAddress: patientPhone,
-        body: smsBody,
-        status: ok ? "SENT" : "FAILED",
-        appointmentId,
-        errorMessage: ok ? null : r?.reason || "sms_not_sent",
-        source,
-      });
+      const r = await sendWhatsapp({ to: patientPhone, body: msgBody });
+      whatsappOk = Boolean(r?.sent);
+      if (whatsappOk) {
+        phoneResult.push({ to: patientPhone, channel: "WHATSAPP", ok: true, meta: r });
+        await persistLog({
+          channel: "WHATSAPP",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: "SENT",
+          appointmentId,
+          source,
+        });
+      } else {
+        fallbackToSms = true;
+      }
     } catch (e) {
-      smsResult.push({ to: patientPhone, ok: false, error: e.message });
-      await persistLog({
-        channel: "SMS",
-        toAddress: patientPhone,
-        body: smsBody,
-        status: "FAILED",
-        appointmentId,
-        errorMessage: e.message,
-        source,
-      });
+      fallbackToSms = true;
+    }
+
+    // 2. Fallback to SMS if WhatsApp failed
+    if (fallbackToSms) {
+      try {
+        const r = await sendSms({ to: patientPhone, body: msgBody });
+        const ok = Boolean(r?.sent);
+        phoneResult.push({ to: patientPhone, channel: "SMS", ok, meta: r });
+        await persistLog({
+          channel: "SMS",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: ok ? "SENT" : "FAILED",
+          appointmentId,
+          errorMessage: ok ? null : r?.reason || "sms_not_sent",
+          source,
+        });
+      } catch (e) {
+        phoneResult.push({ to: patientPhone, channel: "SMS", ok: false, error: e.message });
+        await persistLog({
+          channel: "SMS",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: "FAILED",
+          appointmentId,
+          errorMessage: e.message,
+          source,
+        });
+      }
     }
   }
 
-  return { emailResults, smsResult };
+  return { emailResults, phoneResult };
 }
 
 export async function notifyConsultationCompleted(payload) {
@@ -267,36 +308,65 @@ export async function notifyConsultationCompleted(payload) {
     }
   }
 
-  const smsResult = [];
+  const phoneResult = [];
   if (patientPhone) {
-    const smsBody = `MediConnect: consultation completed (#${appointmentId})`;
+    const msgBody = `MediConnect: consultation completed (#${appointmentId})`;
+    
+    let whatsappOk = false;
+    let fallbackToSms = false;
+
+    // 1. Try WhatsApp
     try {
-      const r = await sendSms({ to: patientPhone, body: smsBody });
-      const ok = Boolean(r?.sent);
-      smsResult.push({ to: patientPhone, ok, meta: r });
-      await persistLog({
-        channel: "SMS",
-        toAddress: patientPhone,
-        body: smsBody,
-        status: ok ? "SENT" : "FAILED",
-        appointmentId,
-        errorMessage: ok ? null : r?.reason || "sms_not_sent",
-        source,
-      });
+      const r = await sendWhatsapp({ to: patientPhone, body: msgBody });
+      whatsappOk = Boolean(r?.sent);
+      if (whatsappOk) {
+        phoneResult.push({ to: patientPhone, channel: "WHATSAPP", ok: true, meta: r });
+        await persistLog({
+          channel: "WHATSAPP",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: "SENT",
+          appointmentId,
+          source,
+        });
+      } else {
+        fallbackToSms = true;
+      }
     } catch (e) {
-      smsResult.push({ to: patientPhone, ok: false, error: e.message });
-      await persistLog({
-        channel: "SMS",
-        toAddress: patientPhone,
-        body: smsBody,
-        status: "FAILED",
-        appointmentId,
-        errorMessage: e.message,
-        source,
-      });
+      fallbackToSms = true;
+    }
+
+    // 2. Fallback to SMS if WhatsApp failed
+    if (fallbackToSms) {
+      try {
+        const r = await sendSms({ to: patientPhone, body: msgBody });
+        const ok = Boolean(r?.sent);
+        phoneResult.push({ to: patientPhone, channel: "SMS", ok, meta: r });
+        await persistLog({
+          channel: "SMS",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: ok ? "SENT" : "FAILED",
+          appointmentId,
+          errorMessage: ok ? null : r?.reason || "sms_not_sent",
+          source,
+        });
+      } catch (e) {
+        phoneResult.push({ to: patientPhone, channel: "SMS", ok: false, error: e.message });
+        await persistLog({
+          channel: "SMS",
+          toAddress: patientPhone,
+          body: msgBody,
+          status: "FAILED",
+          appointmentId,
+          errorMessage: e.message,
+          source,
+        });
+      }
     }
   }
 
-  return { emailResults, smsResult };
+  return { emailResults, phoneResult };
 }
+
 

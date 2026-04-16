@@ -10,12 +10,12 @@ const env = {
   rabbitmqQueue: process.env.RABBITMQ_QUEUE || "notification-service.q",
   rabbitmqPrefetch: Number(process.env.RABBITMQ_PREFETCH) || 10,
 
-  // MySQL
+  // PostgreSQL
   dbHost: process.env.DB_HOST || "localhost",
-  dbPort: Number(process.env.DB_PORT) || 3306,
+  dbPort: Number(process.env.DB_PORT) || 5432,
   dbName: process.env.DB_NAME || "notification_db",
-  dbUser: process.env.DB_USER || "root",
-  dbPassword: process.env.DB_PASSWORD || "root",
+  dbUser: process.env.DB_USER || "postgres",
+  dbPassword: process.env.DB_PASSWORD || "postgres123",
   dbSyncAlter: process.env.DB_SYNC_ALTER !== "false",
 
   // SMTP (email)
@@ -26,10 +26,11 @@ const env = {
   smtpPass: process.env.SMTP_PASS || "",
   smtpFrom: process.env.SMTP_FROM || "",
 
-  // Twilio (SMS)
+  // Twilio (SMS/WhatsApp)
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || "",
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || "",
-  twilioFrom: process.env.TWILIO_FROM || "",
+  twilioFrom: process.env.TWILIO_PHONE_NUMBER || process.env.TWILIO_FROM || "",
+  adminPhoneNumber: process.env.ADMIN_PHONE_NUMBER || "",
 };
 
 export default env;
