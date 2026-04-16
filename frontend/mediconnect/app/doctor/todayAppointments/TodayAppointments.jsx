@@ -1,28 +1,84 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
-
+   const router = useRouter();
   useEffect(() => {
     fetch("http://localhost:4000/api/appointments/doctor/d5aeffa5-4623-4d93-9fc3-3b971e72751d/today", {
       headers: { Authorization: "mock-token" },
     })
       .then((res) => res.json())
-      .then(setAppointments);
+      .then((data) => {
+        console.log("API RESPONSE 👉", data);
+
+        // FIX: ensure it's always an array
+        if (Array.isArray(data)) {
+          setAppointments(data);
+        } else if (data?.appointments) {
+          setAppointments(data.appointments);
+        } else {
+          setAppointments([]);
+        }
+      })
+      .catch((err) => console.error(err));
   }, []);
 
   return (
     <div className="bg-white p-5 rounded shadow">
       <h2 className="text-xl font-bold mb-4">Today Appointments</h2>
 
-      {appointments.map((a) => (
-        <div key={a.id} className="border p-3 mb-2 rounded">
-          <p>Patient: {a.patientId}</p>
-          <p>Time: {a.timeSlot}</p>
-        </div>
-      ))}
+      <div className="overflow-x-auto">
+        <table className="w-full border border-gray-200 rounded">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-left">Appointment ID</th>
+              <th className="p-3 text-left">Patient ID</th>
+              <th className="p-3 text-left">Time</th>
+              <th className="p-3 text-center">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {appointments.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="text-center p-4 text-gray-500">
+                  No appointments for today
+                </td>
+              </tr>
+            ) : (
+              appointments.map((a) => (
+                <tr key={a.id} className="border-t">
+                  <td className="p-3">{a.id}</td>
+                  <td className="p-3">{a.patientId}</td>
+                  <td className="p-3">{a.timeSlot}</td>
+
+                  <td className="p-3 flex gap-2 justify-center">
+                    <button
+                      onClick={() =>
+                        router.push(`/doctor/prescription/create?appointmentId=${a.id}&patientId=${a.patientId}`)
+                      }
+                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    >
+                      Add Prescription
+                    </button>
+
+                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                      View Report
+                    </button>
+
+                    <button className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-purple-600">
+                      Start Consultation
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
