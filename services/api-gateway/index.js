@@ -166,6 +166,64 @@ app.put('/api/appointments/:id/cancel', async (req, res) => {
   }
 });
 
+// Get today's appointments for a doctor
+// Frontend calls: GET /api/appointments/doctor/:doctorId/today
+app.get('/api/appointments/doctor/:doctorId/today', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/doctor/${req.params.doctorId}/today`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get pending (confirmed) appointments for a doctor
+// Frontend calls: GET /api/appointments/doctor/:doctorId/pending
+app.get('/api/appointments/doctor/:doctorId/pending', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/doctor/${req.params.doctorId}/pending`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Doctor accept / reject an appointment
+// Frontend calls: PATCH /api/appointments/:id/decision
+// Body: { "doctorId": "doc124", "status": "ACCEPTED" | "REJECTED" }
+app.patch('/api/appointments/:id/decision', async (req, res) => {
+  try {
+    const response = await axios.patch(
+      `${APPOINTMENT_SERVICE}/api/appointments/${req.params.id}/decision`,
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get a single appointment by ID
+// Frontend calls: GET /api/appointments/:id
+app.get('/api/appointments/:id', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/${req.params.id}`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
 // ─── PAYMENT ROUTES ───────────────────────────────────────────────────────────
 
 // Get PayHere form parameters (hash generated server-side)
@@ -675,24 +733,38 @@ app.post("/api/symptoms/check", async (req, res) => {
   }
 });
 
-// Search doctors by speciality
-// Frontend calls: GET /api/doctors/search?speciality=Cardiology
-app.get("/api/doctors/search", async (req, res) => {
-  try {
-    const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/profile/search`,
-      {
-        params: req.query
-      }
-    );
+// ─── DOCTOR CATALOG ROUTES (served by doctor-service) ────────────────────────
 
+// GET /api/doctors?speciality=xxx  — list all or filter by specialty
+app.get("/api/doctors", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors`, { params: req.query });
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
+
+// GET /api/doctors/:id/availability
+app.get("/api/doctors/:id/availability", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors/${req.params.id}/availability`);
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// GET /api/doctors/:id
+app.get("/api/doctors/:id", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors/${req.params.id}`);
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
 // ─── START SERVER ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`API Gateway running on port ${PORT}`));
