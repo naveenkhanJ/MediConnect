@@ -45,7 +45,9 @@ export default function CreatePrescriptionPage() {
 
       alert("Prescription created successfully");
 
-      router.push("/doctor/appointments");
+      // REDIRECT TO TODAY APPOINTMENTS TAB
+      router.replace("/doctor/doctordashboard?tab=today");
+
     } catch (err) {
       if (err.response?.status === 409) {
         alert("Prescription already exists for this appointment");
@@ -78,7 +80,7 @@ export default function CreatePrescriptionPage() {
         {/* Card */}
         <div className="bg-white shadow-lg rounded-2xl p-6 border">
 
-          {/* Medications Section */}
+          {/* Medications */}
           <div className="mb-6">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-lg flex items-center gap-2">
@@ -94,26 +96,19 @@ export default function CreatePrescriptionPage() {
             </div>
 
             {medications.map((m, i) => (
-              <div
-                key={i}
-                className="grid grid-cols-12 gap-2 mb-3 items-center"
-              >
+              <div key={i} className="grid grid-cols-12 gap-2 mb-3 items-center">
                 <input
                   className="col-span-5 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   placeholder="Medicine name"
                   value={m.name}
-                  onChange={(e) =>
-                    handleChange(i, "name", e.target.value)
-                  }
+                  onChange={(e) => handleChange(i, "name", e.target.value)}
                 />
 
                 <input
                   className="col-span-5 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   placeholder="Dose (e.g. 1-0-1)"
                   value={m.dose}
-                  onChange={(e) =>
-                    handleChange(i, "dose", e.target.value)
-                  }
+                  onChange={(e) => handleChange(i, "dose", e.target.value)}
                 />
 
                 <button

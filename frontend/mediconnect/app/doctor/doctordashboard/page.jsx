@@ -5,7 +5,7 @@ import axios from "axios";
 
 import AvailabilityCalendar from "../availability/AvailabilityCalendar";
 import DoctorProfile from "../doctorProfile/DoctorProfile";
-import PendingAppointments from "../pendingAppointments/PendingAppointments";
+import PendingAppointments from "../pendingAppointments/page";
 //import DoctorTelemedicine from "../telemedicine/DoctorTelemedicine";
 import TodayAppointments from "../todayAppointments/todayAppointments";
 
@@ -15,6 +15,7 @@ export default function DoctorDashboard() {
 
   // useEffect(() => {
   //   fetchSummary();
+
   // }, []);
 
   // const fetchSummary = async () => {

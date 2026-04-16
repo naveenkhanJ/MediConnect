@@ -23,18 +23,40 @@ export default function DoctorRegisterPage() {
 
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Upload image to Cloudinary
+  // VALIDATION
+  const validate = () => {
+    let newErrors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // Phone validation (10 digits)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(form.phone)) {
+      newErrors.phone = "Phone must be 10 digits";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Upload image to Cloudinary
   const uploadImage = async () => {
     if (!image) return "";
 
     const data = new FormData();
     data.append("file", image);
-    data.append("upload_preset", "mediconnect_upload"); // your preset
+    data.append("upload_preset", "mediconnect_upload");
 
     setUploading(true);
 
@@ -55,6 +77,9 @@ export default function DoctorRegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    //  stop if validation fails
+    if (!validate()) return;
+
     try {
       const imageUrl = await uploadImage();
 
@@ -69,7 +94,7 @@ export default function DoctorRegisterPage() {
           gender: form.gender.toUpperCase(),
           experience: Number(form.experience),
           fees: Number(form.fees),
-          image: imageUrl, // ✅ SEND IMAGE URL
+          image: imageUrl,
         }),
       });
 
@@ -89,21 +114,70 @@ export default function DoctorRegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4 py-10">
-
       <div className="bg-white shadow-xl rounded-lg w-full max-w-3xl p-8">
 
         <h2 className="text-3xl font-bold text-center mb-6">
           Doctor Registration
         </h2>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
 
-          <input name="fullName" placeholder="Full Name" onChange={handleChange} className="input" required />
-          <input name="email" type="email" placeholder="Email" onChange={handleChange} className="input" required />
-          <input name="phone" placeholder="Phone" onChange={handleChange} className="input" required />
-          <input name="password" type="password" placeholder="Password" onChange={handleChange} className="input" required />
+          {/* FULL NAME */}
+          <input
+            name="fullName"
+            placeholder="Full Name"
+            onChange={handleChange}
+            className="input"
+            required
+          />
 
-          <input name="address" placeholder="Address" onChange={handleChange} className="input md:col-span-2" />
+          {/* EMAIL */}
+          <div>
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              onChange={handleChange}
+              className="input"
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
+          </div>
+
+          {/* PHONE */}
+          <div>
+            <input
+              name="phone"
+              placeholder="Phone"
+              onChange={handleChange}
+              className="input"
+              required
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone}</p>
+            )}
+          </div>
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={handleChange}
+            className="input"
+            required
+          />
+
+          <input
+            name="address"
+            placeholder="Address"
+            onChange={handleChange}
+            className="input md:col-span-2"
+          />
 
           <select name="gender" onChange={handleChange} className="input">
             <option value="">Gender</option>
@@ -112,23 +186,63 @@ export default function DoctorRegisterPage() {
             <option value="OTHER">Other</option>
           </select>
 
-          <input type="date" name="birthday" onChange={handleChange} className="input" />
+          <input
+            type="date"
+            name="birthday"
+            onChange={handleChange}
+            className="input"
+          />
 
-          <input name="licenseNumber" placeholder="License Number" onChange={handleChange} className="input" required />
-          <input name="speciality" placeholder="Speciality" onChange={handleChange} className="input" />
-          <input name="category" placeholder="Category" onChange={handleChange} className="input" />
-          <input name="experience" type="number" placeholder="Experience" onChange={handleChange} className="input" />
+          <input
+            name="licenseNumber"
+            placeholder="License Number"
+            onChange={handleChange}
+            className="input"
+            required
+          />
 
-          <select name="consultationType" onChange={handleChange} className="input">
+          <input
+            name="speciality"
+            placeholder="Speciality"
+            onChange={handleChange}
+            className="input"
+          />
+
+          <input
+            name="category"
+            placeholder="Category"
+            onChange={handleChange}
+            className="input"
+          />
+
+          <input
+            name="experience"
+            type="number"
+            placeholder="Experience"
+            onChange={handleChange}
+            className="input"
+          />
+
+          <select
+            name="consultationType"
+            onChange={handleChange}
+            className="input"
+          >
             <option value="">Consultation Type</option>
             <option value="PHYSICAL">Physical</option>
             <option value="ONLINE">Online</option>
             <option value="BOTH">Both</option>
           </select>
 
-          <input name="fees" type="number" placeholder="Fees" onChange={handleChange} className="input" />
+          <input
+            name="fees"
+            type="number"
+            placeholder="Fees"
+            onChange={handleChange}
+            className="input"
+          />
 
-          {/* ✅ IMAGE UPLOAD */}
+          {/* IMAGE */}
           <div className="md:col-span-2">
             <label className="text-sm text-gray-600">Profile Image</label>
             <input
@@ -139,7 +253,12 @@ export default function DoctorRegisterPage() {
             />
           </div>
 
-          <textarea name="bio" placeholder="Bio" onChange={handleChange} className="input md:col-span-2" />
+          <textarea
+            name="bio"
+            placeholder="Bio"
+            onChange={handleChange}
+            className="input md:col-span-2"
+          />
 
           <button
             type="submit"
