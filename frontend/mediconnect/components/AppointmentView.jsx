@@ -1,7 +1,5 @@
 import { AppContext } from '@/context/AppContext';
-import Image from 'next/image';
 import { useContext, useState } from 'react';
-import {assets} from '../assets/data';
 
 
 
@@ -14,7 +12,7 @@ export default function AppointmentView({
   setSlotTime,
 }) {
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const { currencySymbol, user } = useContext(AppContext);
+  const { user } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -60,7 +58,7 @@ const handleBookAppointment = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         patientId: user.id,
-        doctorId: docInfo._id,
+        doctorId: docInfo.id,
         appointmentDate: appointmentDate,
         timeSlot: slotTime,
         consultationType: consultationType
@@ -95,21 +93,28 @@ const handleBookAppointment = async () => {
     <div className="p-6 mt-20 bg-gray-50 min-h-screen">
       {/* Doctor Info */}
       <div className="flex gap-6 bg-white p-6 rounded-lg shadow">
-        <Image src={docInfo.image} alt={docInfo.name} width={180} height={160} className="bg-[#5F6FFF] w-full sm:max-w-72 rounded-lg" />
+        <img
+          src={docInfo.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(docInfo.fullName)}&background=5F6FFF&color=fff&size=200&rounded=true`}
+          alt={docInfo.fullName}
+          className="bg-[#5F6FFF] w-full sm:max-w-72 rounded-lg object-cover"
+          style={{ width: 180, height: 160 }}
+        />
 
         <div className="flex-1 border border-gray-200 py-7 p-8 bg-white rounded-lg">
           <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
-            {docInfo.name}
-            <Image src={assets.verified_icon} alt="Badge" width={16} height={10} />
+            {docInfo.fullName}
+            <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">Verified</span>
           </p>
           <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
-            <p>{docInfo.degree}</p>
+            <p>{docInfo.category}</p>
+            <span>·</span>
             <p>{docInfo.speciality}</p>
+            <span>·</span>
             <p>{docInfo.experience}</p>
           </div>
-          <p className="text-sm text-gray-600 max-w-[700px] mt-2">{docInfo.about}</p>
+          <p className="text-sm text-gray-600 max-w-[700px] mt-2">{docInfo.bio}</p>
           <p className="mt-3 text-gray-800 font-semibold">
-            Appointment fee: <span className="text-[#5F6FFF]">{currencySymbol}{docInfo.fees}</span>
+            Appointment fee: <span className="text-[#5F6FFF]">Rs. {docInfo.fees}</span>
           </p>
         </div>
       </div>
