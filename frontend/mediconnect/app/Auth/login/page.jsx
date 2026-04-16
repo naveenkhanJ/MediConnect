@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -10,26 +11,58 @@ export default function LoginPage() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };  
-  
+  };
 
-  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    try {
+      const response = await fetch('http://localhost:4000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Login failed');
+        return;
+      }
+
+      // Save token and user
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Role-based redirect
+      const role = data.user.role;
+
+      if (role === 'admin') {
+        window.location.href = '/admin/dashboard';
+      } else if (role === 'doctor') {
+        window.location.href = '/doctor/dashboard';
+      } else if (role === 'patient') {
+        window.location.href = '/';
+      } else {
+        window.location.href = '/';
+      }
+
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4">
       
       <div className="bg-white shadow-xl rounded-lg w-full max-w-md p-8">
         
-        {/* Title */}
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Login
         </h2>
 
-        {/* Form */}
-        <form  className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Email */}
           <div>
             <label className="text-sm text-gray-600">Email</label>
             <input
@@ -43,7 +76,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="text-sm text-gray-600">Password</label>
             <input
@@ -57,7 +89,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Forgot Password */}
           <div className="text-right">
             <Link
               href="/forgot-password"
@@ -67,7 +98,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Button */}
           <button
             type="submit"
             className="bg-[#5F6FFF] text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
@@ -76,7 +106,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Register Link */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?{" "}
           <Link href="/Auth/register" className="text-[#5F6FFF] font-medium hover:underline">

@@ -5,7 +5,6 @@ import Link from "next/link";
 
 export default function RegisterPage() {
   const [role, setRole] = useState("patient");
-
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -14,8 +13,6 @@ export default function RegisterPage() {
     address: "",
     gender: "",
     birthday: "",
-
-    // doctor fields
     licenseNo: "",
     category: "",
     fees: "",
@@ -25,17 +22,49 @@ export default function RegisterPage() {
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, files, type } = e.target;
+    setForm({ ...form, [name]: type === "file" ? (files?.[0] ?? null) : value });
+  };
 
-    if (name === "image") {
-      setForm({ ...form, image: files[0] });
-    } else {
-      setForm({ ...form, [name]: value });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Calculate age from birthday
+    const birthDate = new Date(form.birthday);
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+
+    try {
+      const response = await fetch('http://localhost:4000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          age: age,
+          gender: form.gender,
+          contact: form.phone,
+          role,
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Registration failed');
+        return;
+      }
+
+      alert('Account created! Please login.');
+      window.location.href = '/Auth/login';
+
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#EEF0FF] to-white px-4 py-10 mt-10">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-[#EEF0FF] to-white px-4 py-10 mt-10">
       
       <div className="bg-white shadow-xl rounded-lg w-full max-w-2xl p-8">
 
@@ -85,7 +114,7 @@ export default function RegisterPage() {
         </div>
 
         {/* FORM */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Name */}
           <div>
@@ -242,7 +271,7 @@ export default function RegisterPage() {
 
           {/* Button */}
           <div className="md:col-span-2">
-            <button className="w-full bg-[#5F6FFF] text-white py-2 rounded-lg">
+            <button type="submit" className="w-full bg-[#5F6FFF] text-white py-2 rounded-lg">
               Register
             </button>
           </div>

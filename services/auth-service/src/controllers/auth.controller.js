@@ -46,6 +46,7 @@ export const register = async (req, res) => {
       await axios.post("http://localhost:5002/api/patients/register", {
         user_id: user.id,
         email,
+        password,
         name,
         age,
         gender,
@@ -64,6 +65,7 @@ export const register = async (req, res) => {
       await axios.post("http://localhost:5003/api/doctors/register", {
         user_id: user.id,
         email,
+        password,
         name,
         specialization,
         experience,
