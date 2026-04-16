@@ -31,10 +31,12 @@ export default function PendingAppointments() {
         <div key={a.id} className="border p-3 mb-2 rounded">
           <p><b>Patient:</b> {a.patientId}</p>
           <p><b>Date:</b> {a.appointmentDate}</p>
+          <p><b>Time:</b> {a.timeSlot}</p>
+          <p><b>Type:</b> {a.consultationType}</p>
 
           <div className="flex gap-2 mt-2">
             <button
-              onClick={() => updateStatus(a.id, "CONFIRMED")}
+              onClick={() => updateStatus(a.id, "ACCEPTED")}
               className="bg-green-500 text-white px-3 py-1 rounded"
             >
               Approve

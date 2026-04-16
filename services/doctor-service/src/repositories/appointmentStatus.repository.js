@@ -8,8 +8,8 @@ export const getAppointmentByIdRepo = async (id) => {
     return await AppointmentProvider.getAppointmentById(id);
 };
 
-export const updateAppointmentDecisionRepo = async(id,status) =>{
-    return await AppointmentProvider.updateAppointmentDecision(id,status);
+export const updateAppointmentDecisionRepo = async(id, doctorId, status) =>{
+    return await AppointmentProvider.updateAppointmentDecision(id, doctorId, status);
 };
 
 export const getPendingAppointmentRepo = async(doctorId) => {
