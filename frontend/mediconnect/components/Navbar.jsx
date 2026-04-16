@@ -50,6 +50,10 @@ export default function Navbar() {
           <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold">
             <Link href="/contact">Contact</Link>
           </li>
+          <li className="cursor-pointer hover:text-[#5F6FFF] hover:border-b-2 text-bold">
+            <Link href="/doctor/doctorProfile/register">Doctor Registration</Link>
+          </li>
+          
         </ul>
 
         {/* Auth Buttons / User Menu */}

@@ -6,17 +6,11 @@ export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5003/api/appointments/doctor/doc124")
+    fetch("http://localhost:4000/api/appointments/doctor/d5aeffa5-4623-4d93-9fc3-3b971e72751d/today", {
+      headers: { Authorization: "mock-token" },
+    })
       .then((res) => res.json())
-      .then((data) => {
-        const today = new Date().toISOString().split("T")[0];
-
-        const filtered = data.filter((a) =>
-          a.appointmentDate?.startsWith(today)
-        );
-
-        setAppointments(filtered);
-      });
+      .then(setAppointments);
   }, []);
 
   return (
