@@ -166,6 +166,64 @@ app.put('/api/appointments/:id/cancel', async (req, res) => {
   }
 });
 
+// Get today's appointments for a doctor
+// Frontend calls: GET /api/appointments/doctor/:doctorId/today
+app.get('/api/appointments/doctor/:doctorId/today', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/doctor/${req.params.doctorId}/today`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get pending (confirmed) appointments for a doctor
+// Frontend calls: GET /api/appointments/doctor/:doctorId/pending
+app.get('/api/appointments/doctor/:doctorId/pending', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/doctor/${req.params.doctorId}/pending`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Doctor accept / reject an appointment
+// Frontend calls: PATCH /api/appointments/:id/decision
+// Body: { "doctorId": "doc124", "status": "ACCEPTED" | "REJECTED" }
+app.patch('/api/appointments/:id/decision', async (req, res) => {
+  try {
+    const response = await axios.patch(
+      `${APPOINTMENT_SERVICE}/api/appointments/${req.params.id}/decision`,
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get a single appointment by ID
+// Frontend calls: GET /api/appointments/:id
+app.get('/api/appointments/:id', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE}/api/appointments/${req.params.id}`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
 // ─── PAYMENT ROUTES ───────────────────────────────────────────────────────────
 
 // Get PayHere form parameters (hash generated server-side)
