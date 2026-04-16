@@ -283,7 +283,12 @@ app.put("/api/profile/me", async (req, res) => {
 app.get("/api/doctor/appointments/pending", async (req, res) => {
   try {
     const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/doctor/appointments/pending`
+      `${DOCTOR_SERVICE_URL}/api/doctor/appointments/pending`,
+      {
+      headers: {
+        Authorization: req.headers.authorization
+      }
+    }
     );
 
     res.json(response.data);
@@ -621,6 +626,25 @@ app.get("/api/telemedicine/appointment/:appointmentId", async (req, res) => {
   }
 });
 
+// Search doctors by speciality
+// Frontend calls: GET /api/doctors/search?speciality=Cardiology
+app.get("/api/doctors/search", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${DOCTOR_SERVICE_URL}/api/profile/search`,
+      {
+        params: req.query
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
+  }
+});
+
 //_____________________________AI SYMPTOM CHECKER_________________
 
 const AI_SERVICE_URL = "http://localhost:5005";
@@ -648,24 +672,7 @@ app.post("/api/symptoms/check", async (req, res) => {
   }
 });
 
-// Search doctors by speciality
-// Frontend calls: GET /api/doctors/search?speciality=Cardiology
-app.get("/api/doctors/search", async (req, res) => {
-  try {
-    const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/profile/search`,
-      {
-        params: req.query
-      }
-    );
 
-    res.json(response.data);
-  } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
-  }
-});
 // ─── START SERVER ─────────────────────────────────────────────────────────────
 // app.listen must always be at the end, after all routes are registered
 const PORT = 4000;
