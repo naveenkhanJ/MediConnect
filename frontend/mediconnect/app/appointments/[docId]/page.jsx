@@ -1,15 +1,12 @@
-"use client"; // ← MUST be here at the top
+"use client";
 
 import AppointmentView from "@/components/AppointmentView";
 import { useAppointment } from "@/hooks/useAppointment";
-import { useParams } from "next/navigation"; // optional if getting docId from route
-import { doctors } from "@/assets/data"; // ✅ Import doctors data
+import { useParams } from "next/navigation";
 
 export default function AppointmentPage() {
-  const params = useParams();
-  const docId = params.docId; // get docId from URL
+  const { docId } = useParams();
 
-  // ✅ Call the hook inside the component
   const {
     docInfo,
     docSlot,
@@ -17,7 +14,25 @@ export default function AppointmentPage() {
     setSelectedDate,
     slotTime,
     setSlotTime,
-  } = useAppointment(doctors, docId);
+    loading,
+    error
+  } = useAppointment(docId);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">
+        Loading doctor details...
+      </div>
+    );
+  }
+
+  if (error || !docInfo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-400 text-sm">
+        {error || "Doctor not found."}
+      </div>
+    );
+  }
 
   return (
     <AppointmentView
