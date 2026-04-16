@@ -14,11 +14,11 @@ app.use(bodyParser.json());
 let appointments = [
     {
         id: "4",
-        doctorId: "doc124",
+        doctorId: "d5aeffa5-4623-4d93-9fc3-3b971e72751d",
       patientId: "pat003",
-        appointmentDate: "2026-04-06",
+        appointmentDate: "2026-04-16",
         timeSlot: "10:00 AM",
-        status: "CONFIRMED",
+        status: "PENDING",
         paymentStatus: "Confirmed",
     },
     {
@@ -32,11 +32,28 @@ let appointments = [
     },
     {
         id: "6",
-        doctorId: "doc124",
-        patientId: "pat001",
-        appointmentDate: "2026-04-07",
+        doctorId: "d5aeffa5-4623-4d93-9fc3-3b971e72751d",
+        patientId: "pat003",
+        appointmentDate: "2026-04-16",
         timeSlot: "09:30 AM",
         status: "PENDING",
+        paymentStatus: "FAILED",
+    }, {
+        id: "10",
+        doctorId: "d5aeffa5-4623-4d93-9fc3-3b971e72751d",
+        patientId: "pat003",
+        appointmentDate: "2026-04-16",
+        timeSlot: "09:30 AM",
+        status: "CONFIRMED",
+        paymentStatus: "FAILED",
+    },
+    {
+        id: "7",
+        doctorId: "doc124",
+        patientId: "pat001",
+        appointmentDate: "2026-04-16",
+        timeSlot: "09:30 AM",
+        status: "CONFIRMED",
         paymentStatus: "FAILED",
     },
 ];
@@ -80,6 +97,16 @@ app.get("/api/appointments/doctor/:doctorId", (req, res) => {
     );
 
     res.json(doctorAppointments);
+});
+// GET MY APPOINTMENTS (used by frontend via gateway)
+app.get("/api/appointments/my/list", (req, res) => {
+    const doctorId = req.headers["x-patient-id"]; // (you reused header)
+
+    const myAppointments = appointments.filter(
+        (a) => a.doctorId === doctorId
+    );
+
+    res.json(myAppointments);
 });
 // Start server
 app.listen(PORT, () => {

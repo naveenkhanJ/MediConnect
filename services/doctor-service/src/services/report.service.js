@@ -1,21 +1,27 @@
-import axios from "axios";
 
-const PATIENT_SERVICE_URL = "http://localhost:5000/api/patients";
+import { getAppointmentByIdRepo } from "../repositories/appointmet.repository.js";
+import { getPatientReportsRepo } from "../repositories/report.repository.js";
 
-//fetch all uploaded reports of a patients
-export const getPatientReport = async (patientId) =>{
-    try{ 
-    const res = await axios.get(`${PATIENT_SERVICE_URL}/${patientId}/reports`);
+export const getPatientReportsService = async ({
+  appointmentId,
+  doctorId
+}) => {
 
-    return res.data.map(report => ({
-        id:report.id,
-        name:report.report_name,
-        url:report.file_url,
-        description:report.description,
-        uploadedAt:report.created_at
-    }));
-    }catch (error) {
-        console.error("Patient Service Error:", error.response?.status);
-        throw new Error("Patient service not reachable");
-    }
+  // 1. Get appointment
+  const appointment = await getAppointmentByIdRepo(appointmentId);
+
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+
+  // 2. Security check (VERY IMPORTANT)
+  if (appointment.doctorId !== doctorId) {
+    throw new Error("Unauthorized access");
+  }
+
+  // 3. Get patientId from appointment
+  const patientId = appointment.patientId;
+
+  // 4. Fetch reports
+  return await getPatientReportsRepo(patientId);
 };
