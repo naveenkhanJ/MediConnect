@@ -2,67 +2,79 @@
 
 import { useState, useEffect } from "react";
 
-export const useAppointment = (doctors, docId) => {
-  const [docInfo, setDocInfo] = useState(null);
-  const [docSlot, setDocSlot] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(0);
-  const [slotTime, setSlotTime] = useState("");
+const API = "http://localhost:4000";
 
-  const getAvailableSlots = () => {
-    let today = new Date();
-    let allSlots = [];
+// Generate 30-min slots between startTime and endTime ("HH:MM" format)
+function generateSlots(dateStr, startTime, endTime) {
+  const [sh, sm] = startTime.split(":").map(Number);
+  const [eh, em] = endTime.split(":").map(Number);
 
-    for (let i = 0; i < 7; i++) {
-      let currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
+  const start = new Date(dateStr);
+  start.setHours(sh, sm, 0, 0);
 
-      let endTime = new Date(currentDate);
-      endTime.setHours(21, 0, 0, 0);
+  const end = new Date(dateStr);
+  end.setHours(eh, em, 0, 0);
 
-      if (i === 0) {
-        currentDate.setHours(
-          today.getHours() > 10 ? today.getHours() + 1 : 10
-        );
-        currentDate.setMinutes(0);
-      } else {
-        currentDate.setHours(10, 0, 0, 0);
-      }
+  const now = new Date();
+  const slots = [];
+  const cursor = new Date(start);
 
-      let timeSlots = [];
-
-      while (currentDate < endTime) {
-        timeSlots.push({
-          datetime: new Date(currentDate),
-          time: currentDate.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        });
-
-        currentDate.setMinutes(currentDate.getMinutes() + 30);
-      }
-
-      allSlots.push({
-        date: new Date(currentDate),
-        slots: timeSlots,
+  while (cursor < end) {
+    if (cursor > now) {
+      slots.push({
+        datetime: new Date(cursor),
+        time: cursor.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       });
     }
+    cursor.setMinutes(cursor.getMinutes() + 30);
+  }
+  return slots;
+}
 
-    setDocSlot(allSlots);
-  };
+export const useAppointment = (docId) => {
+  const [docInfo, setDocInfo]       = useState(null);
+  const [docSlot, setDocSlot]       = useState([]);
+  const [selectedDate, setSelectedDate] = useState(0);
+  const [slotTime, setSlotTime]     = useState("");
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
 
   useEffect(() => {
-    if (doctors && docId) {
-      const found = doctors.find(
-        (doc) => String(doc._id) === String(docId)
-      );
-      setDocInfo(found);
-    }
-  }, [doctors, docId]);
+    if (!docId) return;
 
-  useEffect(() => {
-    getAvailableSlots();
-  }, []);
+    const fetchDoctorAndAvailability = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [docRes, availRes] = await Promise.all([
+          fetch(`${API}/api/doctors/${docId}`),
+          fetch(`${API}/api/doctors/${docId}/availability`)
+        ]);
+
+        if (!docRes.ok) throw new Error("Doctor not found");
+        const doctor = await docRes.json();
+        setDocInfo(doctor);
+
+        const availability = availRes.ok ? await availRes.json() : [];
+
+        // Build slot groups from availability records
+        const slotGroups = availability
+          .map((avail) => {
+            const slots = generateSlots(avail.date, avail.startTime, avail.endTime);
+            return slots.length > 0 ? { date: new Date(avail.date), slots } : null;
+          })
+          .filter(Boolean);
+
+        setDocSlot(slotGroups);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctorAndAvailability();
+  }, [docId]);
 
   return {
     docInfo,
@@ -71,5 +83,7 @@ export const useAppointment = (doctors, docId) => {
     setSelectedDate,
     slotTime,
     setSlotTime,
+    loading,
+    error
   };
 };
