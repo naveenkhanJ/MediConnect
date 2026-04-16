@@ -1,3 +1,5 @@
+import { doctorProfileRepository } from "../repositories/doctorProfile.repository.js";
+
 export const requireVerifiedDoctor = async (req, res, next) => {
   try {
     if (req.user.role !== "doctor") {

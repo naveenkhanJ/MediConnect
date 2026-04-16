@@ -4,7 +4,9 @@ import {
   findAppointmentByDoctorDateSlot,
   findAppointmentById,
   updateAppointment,
-  findAppointmentsByPatientId
+  findAppointmentsByPatientId,
+  findConfirmedAppointmentsByDoctorId,
+  findTodaysAppointmentsByDoctorId
 } from "../repositories/appointment.repository.js";
 
 import {
@@ -152,7 +154,46 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
   appointment.status = "CONFIRMED";
   appointment.paymentId = paymentId;
 
-  
   await updateAppointment(appointment);
   return appointment;
+};
+
+export const getAppointmentByIdService = async (appointmentId) => {
+  const appointment = await findAppointmentById(appointmentId);
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+  return appointment;
+};
+
+export const getDoctorPendingAppointmentsService = async (doctorId) => {
+  return findConfirmedAppointmentsByDoctorId(doctorId);
+};
+
+export const handleDoctorDecisionService = async ({ appointmentId, doctorId, status }) => {
+  const appointment = await findAppointmentById(appointmentId);
+
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+
+  if (appointment.doctorId !== doctorId) {
+    throw new Error("You are not authorized to modify this appointment");
+  }
+
+  if (appointment.status !== "CONFIRMED") {
+    throw new Error("Only confirmed appointments can be accepted or rejected");
+  }
+
+  if (!["ACCEPTED", "REJECTED"].includes(status)) {
+    throw new Error("Invalid decision. Use ACCEPTED or REJECTED");
+  }
+
+  appointment.status = status === "REJECTED" ? "CANCELLED" : "CONFIRMED";
+  await updateAppointment(appointment);
+  return appointment;
+};
+
+export const getDoctorTodayAppointmentsService = async (doctorId) => {
+  return findTodaysAppointmentsByDoctorId(doctorId);
 };
