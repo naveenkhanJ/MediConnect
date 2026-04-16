@@ -3,9 +3,8 @@ import { createProfileService, getProfileService, updateProfileService,getDoctor
 //create profile
 export const createProfileController = async(req,res) =>{
     try{
-        const doctorId= req.user.id;
 
-        const profile = await createProfileService(doctorId, req.body);
+        const profile = await createProfileService(req.body);
 
         res.status(201).json(profile);
 
