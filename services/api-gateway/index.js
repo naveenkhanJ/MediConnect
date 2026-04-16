@@ -93,6 +93,7 @@ app.post('/patients/reports', async (req, res) => {
   }
 });
 
+
 // ─── APPOINTMENT ROUTES ───────────────────────────────────────────────────────
 
 // Search doctors by specialty

@@ -1,157 +1,153 @@
 "use client";
+import React, { useState } from 'react';
 
-import { useState } from "react";
-
-export default function ProfileSettings() {
-  const [form, setForm] = useState({
-    title: "",
-    firstName: "",
-    lastName: "",
-    displayName: "",
-    mobile: "",
-    gender: "",
-    age: "",
+export default function ProfileUpdatePage() {
+  // Initialize state with existing user data
+  const [userData, setUserData] = useState({
+    title: "Mr.",
+    firstName: "John",
+    lastName: "Doe",
+    mobile: "+1 234 567 8900",
+    displayName: "John Doe",
+    gender: "Male",
+    age: "35"
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setUserData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Saved Data:", form);
+    console.log("Updating Database with:", userData);
+    alert("Profile Updated Successfully!");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-6">
-
-        {/* Tabs */}
-        <div className="flex gap-6 border-b pb-3 text-sm font-medium text-gray-600">
-          <button className="text-blue-600 border-b-2 border-blue-600 pb-2">
-            Profile
-          </button>
-          <button>Change Password</button>
-          <button>Email Notification</button>
-          <button>Delete Account</button>
+    <div className="min-h-screen  p-4  font-sans text-slate-700 mt-16 border border-gray-200">
+      <div className="max-w-4xl bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        
+        {/* Tab Navigation */}
+        <div className="flex bg-gray-100/50 p-2 border-b border-gray-200 p ">
+          <button className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-t-lg font-medium text-sm">Profile</button>
+          <button className="flex-1 py-3 px-4 text-gray-500 hover:bg-gray-200 transition text-sm">Change Password</button>
+          <button className="flex-1 py-3 px-4 text-gray-500 hover:bg-gray-200 transition text-sm">Email Notification</button>
+          <button className="flex-1 py-3 px-4 text-gray-500 hover:bg-gray-200 transition text-sm">Delete Account</button>
         </div>
 
-        {/* Title */}
-        <div className="mt-6">
-          <h1 className="text-xl font-semibold text-gray-800">
-            Profile Settings
-          </h1>
-          <p className="text-sm text-gray-500">Information</p>
+        <div className="p-8">
+          <h1 className="text-2xl font-bold text-slate-800 mb-4">Profile Settings</h1>
+          <div className="border-b border-gray-100 mb-8"></div>
+          
+          <form onSubmit={handleSubmit}>
+            <h2 className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-6">Information</h2>
+
+            {/* Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              
+              {/* Title Dropdown */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-600">Title</label>
+                <select 
+                  name="title"
+                  value={userData.title}
+                  onChange={handleChange}
+                  className="p-3 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                >
+                  <option>Mr.</option>
+                  <option>Mrs.</option>
+                  <option>Dr.</option>
+                </select>
+              </div>
+
+              {/* Last Name */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-600">Last Name</label>
+                <input 
+                  type="text"
+                  name="lastName"
+                  value={userData.lastName}
+                  onChange={handleChange}
+                  className="p-3 border border-gray-200 rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              {/* First Name */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-600">First Name</label>
+                <input 
+                  type="text"
+                  name="firstName"
+                  value={userData.firstName}
+                  onChange={handleChange}
+                  className="p-3 border border-gray-200 rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              {/* Mobile Number */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-600">Mobile Number</label>
+                <input 
+                  type="text"
+                  name="mobile"
+                  value={userData.mobile}
+                  onChange={handleChange}
+                  className="p-3 border border-gray-200 rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              {/* Display Name (Full Width logic inside grid) */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-600">Display Name</label>
+                <input 
+                  type="text"
+                  name="displayName"
+                  value={userData.displayName}
+                  onChange={handleChange}
+                  className="p-3 border border-gray-200 rounded-lg focus:border-blue-500 outline-none"
+                />
+              </div>
+
+              {/* Gender & Age Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-600">Gender</label>
+                  <select 
+                    name="gender"
+                    value={userData.gender}
+                    onChange={handleChange}
+                    className="p-3 bg-white border border-gray-200 rounded-lg outline-none"
+                  >
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-600">Age</label>
+                  <input 
+                    type="number"
+                    name="age"
+                    value={userData.age}
+                    onChange={handleChange}
+                    className="p-3 border border-gray-200 rounded-lg outline-none"
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            {/* Save Button */}
+            <div className="mt-12 flex justify-end">
+              <button 
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md shadow-blue-200 transition-all active:scale-95"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
         </div>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {/* Title */}
-          <div>
-            <label className="text-sm text-gray-600">Title</label>
-            <select
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-            >
-              <option value="">Select</option>
-              <option>Mr</option>
-              <option>Mrs</option>
-              <option>Miss</option>
-            </select>
-          </div>
-
-          {/* First Name */}
-          <div>
-            <label className="text-sm text-gray-600">First Name</label>
-            <input
-              name="firstName"
-              value={form.firstName}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-              placeholder="First Name"
-            />
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label className="text-sm text-gray-600">Last Name</label>
-            <input
-              name="lastName"
-              value={form.lastName}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-              placeholder="Last Name"
-            />
-          </div>
-
-          {/* Display Name */}
-          <div>
-            <label className="text-sm text-gray-600">Display Name</label>
-            <input
-              name="displayName"
-              value={form.displayName}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-              placeholder="Display Name"
-            />
-          </div>
-
-          {/* Mobile */}
-          <div>
-            <label className="text-sm text-gray-600">Mobile Number</label>
-            <input
-              name="mobile"
-              value={form.mobile}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-              placeholder="+94 XX XXX XXXX"
-            />
-          </div>
-
-          {/* Gender */}
-          <div>
-            <label className="text-sm text-gray-600">Gender</label>
-            <select
-              name="gender"
-              value={form.gender}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-            >
-              <option value="">Select</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          {/* Age */}
-          <div>
-            <label className="text-sm text-gray-600">Age</label>
-            <input
-              type="number"
-              name="age"
-              value={form.age}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-              placeholder="Age"
-            />
-          </div>
-
-          {/* Button */}
-          <div className="md:col-span-2 flex justify-end mt-4">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

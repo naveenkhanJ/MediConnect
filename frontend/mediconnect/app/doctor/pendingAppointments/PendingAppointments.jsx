@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 
 export default function PendingAppointments() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/doctor/appointments/pending")
-      .then((res) => res.json())
-      .then(setAppointments);
+    apiFetch("/api/doctor/appointments/pending", { auth: true })
+      .then(setAppointments)
+      .catch((err) => alert(err?.message || "Failed to load appointments"));
   }, []);
 
   const updateStatus = async (id, status) => {
-    await fetch(`http://localhost:4000/api/doctor/appointments/${id}/decision`, {
+    await apiFetch(`/api/doctor/appointments/${id}/decision`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      auth: true,
       body: JSON.stringify({ status }),
     });
 
