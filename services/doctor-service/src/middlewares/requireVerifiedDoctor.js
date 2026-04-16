@@ -1,26 +1,24 @@
-import { doctorProfileRepository } from "../repositories/doctorProfile.repository.js";
-
 export const requireVerifiedDoctor = async (req, res, next) => {
   try {
-    const doctorId = req.user?.id;
-
-    if (!doctorId) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (req.user.role !== "doctor") {
+      return res.status(403).json({ message: "Only doctors allowed" });
     }
 
-    const doctor = await doctorProfileRepository.findByDoctorId(doctorId);
+    const profile = await doctorProfileRepository.findByDoctorId(req.user.id);
 
-    if (!doctor) {
+    if (!profile) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
 
-    if (!doctor.isVerified) {
-      return res.status(403).json({ message: "Doctor account is not verified yet" });
+    if (!profile.isVerified) {
+      return res.status(403).json({
+        message: "Profile not verified. Access denied."
+      });
     }
 
-    req.doctor = doctor;
+    req.doctorProfile = profile; // optional for reuse
     next();
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
