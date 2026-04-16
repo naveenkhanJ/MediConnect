@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
-import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment } from '../controllers/patient.controler.js';
+import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports } from '../controllers/patient.controler.js';
 
 const router = express.Router();
 
@@ -16,6 +16,12 @@ router.put('/:id', authMiddleware, updateProfile);
 
 // Upload report for a patient
 router.post('/reports', authMiddleware, uploadReport);
+
+//view reports for a patient
+router.get('/reports', authMiddleware, getReports);
+
+//delete patient account
+router.delete('/:id', authMiddleware, deleteAccount);
 
 // Create doctor appointment
 router.post('/appointments', authMiddleware, createDoctorAppointment);
