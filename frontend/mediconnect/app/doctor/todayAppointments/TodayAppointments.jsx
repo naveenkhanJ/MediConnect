@@ -7,7 +7,7 @@ export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
    const router = useRouter();
   useEffect(() => {
-    fetch("http://localhost:4000/api/appointments/doctor/d5aeffa5-4623-4d93-9fc3-3b971e72751d/today", {
+    fetch("http://localhost:4000/api/appointments/doctor/bb910126-bc62-4d81-8c8f-641325b178e1/today", {
       headers: { Authorization: "mock-token" },
     })
       .then((res) => res.json())
