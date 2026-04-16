@@ -5,31 +5,30 @@ import axios from "axios";
 
 import AvailabilityCalendar from "../availability/AvailabilityCalendar";
 import DoctorProfile from "../doctorProfile/DoctorProfile";
-import PendingAppointments from "../pendingAppointments/page";
-//import DoctorTelemedicine from "../telemedicine/DoctorTelemedicine";
+import PendingAppointments from "../pendingAppointments/PendingAppointments";
+import DoctorTelemedicine from "../telemedicine/DoctorTelemedicine";
 import TodayAppointments from "../todayAppointments/TodayAppointments";
 
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [summary, setSummary] = useState(null);
 
-  // useEffect(() => {
-  //   fetchSummary();
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
-  // }, []);
-
-  // const fetchSummary = async () => {
-  //   try {
-  //     const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
-  //       headers: {
-  //         Authorization: "mock-token",
-  //       },
-  //     });
-  //     setSummary(res.data);
-  //   } catch (err) {
-  //     console.error("Failed to load dashboard summary:", err.message);
-  //   }
-  // };
+  const fetchSummary = async () => {
+    try {
+      const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
+        headers: {
+          Authorization: "mock-token",
+        },
+      });
+      setSummary(res.data);
+    } catch (err) {
+      console.error("Failed to load dashboard summary:", err.message);
+    }
+  };
 
   const menu = [
     { key: "dashboard", label: "Dashboard" },
@@ -37,7 +36,7 @@ export default function DoctorDashboard() {
     { key: "profile", label: "Doctor Profile" },
     { key: "appointments", label: "Pending Appointments" },
     { key: "today", label: "Today's Appointments" },
-   // { key: "telemedicine", label: "Telemedicine" },
+    { key: "telemedicine", label: "Telemedicine" },
   ];
 
   return (

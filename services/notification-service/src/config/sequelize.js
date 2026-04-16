@@ -4,9 +4,8 @@ import env from "./env.js";
 export const sequelize = new Sequelize(env.dbName, env.dbUser, env.dbPassword, {
   host: env.dbHost,
   port: env.dbPort,
-  dialect: "mysql",
+  dialect: "postgres",
   logging: false,
 });
 
 export default sequelize;
-

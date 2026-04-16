@@ -53,6 +53,11 @@ const Appointment = sequelize.define(
       ),
       allowNull: false,
       defaultValue: "PENDING_PAYMENT"
+    },
+    docStatus: {
+      type: DataTypes.ENUM("PENDING", "ACCEPTED", "REJECTED"),
+      allowNull: false,
+      defaultValue: "PENDING"
     }
   },
   {

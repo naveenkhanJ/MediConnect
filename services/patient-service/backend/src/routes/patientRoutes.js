@@ -1,12 +1,15 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
-import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment } from '../controllers/patient.controler.js';
+import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment, getPatientContactInternal } from '../controllers/patient.controler.js';
 
 const router = express.Router();
 
 // Register a new patient
 router.post('/register', registerPatient);
+
+// Internal service-to-service endpoint — returns email + contact only, no user auth required
+router.get('/internal/:id', getPatientContactInternal);
 
 // Get patient profile
 router.get('/:id', authMiddleware, getProfile);

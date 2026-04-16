@@ -5,10 +5,10 @@ dotenv.config();
 const env = {
   port: process.env.PORT || 5005,
   dbHost: process.env.DB_HOST || "localhost",
-  dbPort: Number(process.env.DB_PORT) || 3306,
+  dbPort: Number(process.env.DB_PORT) || 5432,
   dbName: process.env.DB_NAME || "telemedicine_db",
-  dbUser: process.env.DB_USER || "root", 
-  dbPassword: process.env.DB_PASSWORD || "root",
+  dbUser: process.env.DB_USER || "postgres",
+  dbPassword: process.env.DB_PASSWORD || "postgres123",
   jitsiBaseUrl: process.env.JITSI_BASE_URL || "https://meet.jit.si",
   jitsiAppId: process.env.JITSI_APP_ID || "mediconnect",
   jitsiAppSecret: process.env.JITSI_APP_SECRET || null,

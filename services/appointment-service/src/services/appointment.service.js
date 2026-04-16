@@ -155,6 +155,30 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
   appointment.paymentId = paymentId;
 
   await updateAppointment(appointment);
+
+  // Notify patient and doctor after confirmation — fire-and-forget
+  try {
+    const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
+    const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+
+    // Fetch patient contact details from patient service (internal endpoint, no auth)
+    const patientRes = await axios.get(
+      `${patientServiceUrl}/api/patients/internal/${appointment.patientId}`
+    );
+    const patient = patientRes.data;
+
+    await axios.post(`${notificationServiceUrl}/api/v1/notifications/appointment-booked`, {
+      appointmentId: appointment.id,
+      patientEmail: patient.email || undefined,
+      patientPhone: patient.contact || undefined,
+      doctorEmail: undefined,   // doctor email not yet in doctor model; extend later if needed
+      source: "appointment-service",
+    });
+  } catch (notifyErr) {
+    // Notification failure must never break the confirmation flow
+    console.warn("Notification dispatch failed:", notifyErr.message);
+  }
+
   return appointment;
 };
 
@@ -185,11 +209,15 @@ export const handleDoctorDecisionService = async ({ appointmentId, doctorId, sta
     throw new Error("Only confirmed appointments can be accepted or rejected");
   }
 
+  if (appointment.docStatus !== "PENDING") {
+    throw new Error("Doctor has already made a decision on this appointment");
+  }
+
   if (!["ACCEPTED", "REJECTED"].includes(status)) {
     throw new Error("Invalid decision. Use ACCEPTED or REJECTED");
   }
 
-  appointment.status = status === "REJECTED" ? "CANCELLED" : "CONFIRMED";
+  appointment.docStatus = status;
   await updateAppointment(appointment);
   return appointment;
 };
