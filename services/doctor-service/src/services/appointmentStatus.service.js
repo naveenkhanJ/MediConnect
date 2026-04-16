@@ -23,17 +23,17 @@ export const handleAppointmentDesicionService = async ({
         throw new Error("You are not allowed to modfy this appointment");
     }
 
-    // only allow if the status is pending
-    if(appointment.status !== "PENDING"){
-        throw new Error("only pending appointments can be approved/rejected");
+    // only allow if the appointment is CONFIRMED (awaiting doctor action)
+    if(appointment.status !== "CONFIRMED"){
+        throw new Error("only confirmed appointments can be accepted or rejected");
 
     }
 
-    if(!["Approve", "Reject"].includes(status)){
-        throw new Error("Invalid status");
+    if(!["ACCEPTED", "REJECTED"].includes(status)){
+        throw new Error("Invalid status. Use ACCEPTED or REJECTED");
     }
 
-    return await updateAppointmentDecisionRepo(appointmentId,status);
+    return await updateAppointmentDecisionRepo(appointmentId, doctorId, status);
 
 };
 
