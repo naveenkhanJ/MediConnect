@@ -10,18 +10,42 @@ const Doctor = sequelize.define(
       primaryKey: true
     },
 
-    doctorId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-    },
-
-    name: {
+    fullName: {
       type: DataTypes.STRING,
       allowNull: false
     },
 
     email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isEmail: true
+      }
+    },
+
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+    address: {
+      type: DataTypes.TEXT
+    },
+
+    gender: {
+      type: DataTypes.ENUM("MALE", "FEMALE", "OTHER")
+    },
+
+    birthday: {
+      type: DataTypes.DATE
+    },
+
+    licenseNumber: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -31,18 +55,29 @@ const Doctor = sequelize.define(
       allowNull: false
     },
 
+    category: {
+      type: DataTypes.STRING // e.g. Specialist, Consultant
+    },
+
+    experience: {
+      type: DataTypes.INTEGER // years
+    },
+
     consultationType: {
       type: DataTypes.ENUM("PHYSICAL", "ONLINE", "BOTH"),
       allowNull: false
     },
 
-    bio: {
-      type: DataTypes.TEXT
+    fees: {
+      type: DataTypes.FLOAT
     },
 
-    licenseNumber: {
-      type: DataTypes.STRING,
-      allowNull: false
+    image: {
+      type: DataTypes.STRING // store URL
+    },
+
+    bio: {
+      type: DataTypes.TEXT
     },
 
     isVerified: {
