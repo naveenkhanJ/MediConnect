@@ -10,9 +10,14 @@ export const doctorProfileRepository = {
     return await Doctor.findOne({ where: { id } });
   },
 
+  findAll: async () => {
+    return await Doctor.findAll({ order: [["fullName", "ASC"]] });
+  },
+
   findBySpeciality: async (speciality) => {
     return await Doctor.findAll({
-      where: { speciality }
+      where: { speciality },
+      order: [["fullName", "ASC"]]
     });
   },
   
