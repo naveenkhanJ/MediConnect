@@ -57,7 +57,7 @@ export const createAppointmentService = async ({
   });
 
   const paymentResponse = await axios.post(
-    `${process.env.PAYMENT_SERVICE_URL}/api/payments/create`,
+    `${process.env.PAYMENT_SERVICE_URL || "http://localhost:5003"}/api/payments/create`,
     {
       appointmentId: appointment.id,
       patientId,
