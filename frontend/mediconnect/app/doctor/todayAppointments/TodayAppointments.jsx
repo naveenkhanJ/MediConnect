@@ -6,17 +6,11 @@ export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5003/api/appointments/doctor/doc124")
+    fetch("http://localhost:4000/api/appointments/doctor/doc124/today", {
+      headers: { Authorization: "mock-token" },
+    })
       .then((res) => res.json())
-      .then((data) => {
-        const today = new Date().toISOString().split("T")[0];
-
-        const filtered = data.filter((a) =>
-          a.appointmentDate?.startsWith(today)
-        );
-
-        setAppointments(filtered);
-      });
+      .then(setAppointments);
   }, []);
 
   return (
@@ -25,8 +19,20 @@ export default function TodayAppointments() {
 
       {appointments.map((a) => (
         <div key={a.id} className="border p-3 mb-2 rounded">
-          <p>Patient: {a.patientId}</p>
-          <p>Time: {a.timeSlot}</p>
+          <p><b>Patient:</b> {a.patientId}</p>
+          <p><b>Time:</b> {a.timeSlot}</p>
+          <p><b>Type:</b> {a.consultationType}</p>
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded ${
+              a.docStatus === "ACCEPTED"
+                ? "bg-green-100 text-green-700"
+                : a.docStatus === "REJECTED"
+                ? "bg-red-100 text-red-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
+            {a.docStatus}
+          </span>
         </div>
       ))}
     </div>
