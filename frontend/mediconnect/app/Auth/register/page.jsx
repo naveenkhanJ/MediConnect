@@ -26,7 +26,7 @@ export default function RegisterPage() {
     const age = new Date().getFullYear() - birthDate.getFullYear();
 
     try {
-      const response = await fetch('http://localhost:4000/patients/register', {
+      const response = await fetch('http://localhost:4000/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -35,7 +35,8 @@ export default function RegisterPage() {
           password: form.password,
           age: age,
           gender: form.gender,
-          contact: form.phone   // backend expects 'contact', form uses 'phone'
+          contact: form.phone,
+          role: 'patient'
         })
       });
 

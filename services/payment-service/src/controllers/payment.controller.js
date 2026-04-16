@@ -67,8 +67,15 @@ export const getPayhereParamsController = async (req, res) => {
   try {
     const payment = await getPaymentByIdService(req.params.paymentId);
 
-    const merchantId = process.env.PAYHERE_MERCHANT_ID || "1211149";
-    const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || "MzgwMzg0NjQzMDMwNzQ4MzY4NDEwMjI2OTM3NjI4NjU1Njgy";
+    const merchantId = process.env.PAYHERE_MERCHANT_ID;
+    const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
+    const notifyUrl = process.env.PAYHERE_NOTIFY_URL;
+    const returnUrl = process.env.PAYHERE_RETURN_URL || "http://localhost:3000/payment/success";
+    const cancelUrl = process.env.PAYHERE_CANCEL_URL || "http://localhost:3000/payment/cancel";
+
+    if (!merchantId || !merchantSecret || !notifyUrl) {
+      return res.status(500).json({ message: "PayHere credentials not configured" });
+    }
 
     // PayHere hash formula:
     // MD5( merchant_id + order_id + amount(2dp) + currency + MD5(merchant_secret).toUpperCase() ).toUpperCase()
@@ -82,9 +89,9 @@ export const getPayhereParamsController = async (req, res) => {
 
     res.status(200).json({
       merchant_id: merchantId,
-      return_url: "http://localhost:3000/payment/success",
-      cancel_url: "http://localhost:3000/payment/cancel",
-      notify_url: "https://procurer-speed-shading.ngrok-free.dev",
+      return_url: returnUrl,
+      cancel_url: cancelUrl,
+      notify_url: notifyUrl,
       order_id: payment.id,
       items: "Doctor Consultation",
       amount: amountFormatted,
@@ -108,11 +115,36 @@ export const getPayhereParamsController = async (req, res) => {
 // PayHere sends this as form data (x-www-form-urlencoded), not JSON
 export const payhereNotifyController = async (req, res) => {
   try {
-    const { order_id, status_code } = req.body;
+    const {
+      merchant_id,
+      order_id,
+      payment_id,
+      payhere_amount,
+      payhere_currency,
+      status_code,
+      md5sig
+    } = req.body;
 
-    // status_code 2 = SUCCESS, 0 = FAILED, -1 = CANCELLED, -2 = CHARGEBACK
+    // Verify PayHere MD5 signature to ensure the request is genuine
+    // Formula: MD5(merchant_id + order_id + payhere_amount + payhere_currency + status_code + MD5(merchant_secret).toUpperCase()).toUpperCase()
+    const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
+    if (merchantSecret) {
+      const hashedSecret = crypto.createHash("md5").update(merchantSecret).digest("hex").toUpperCase();
+      const expectedSig = crypto
+        .createHash("md5")
+        .update(merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret)
+        .digest("hex")
+        .toUpperCase();
+
+      if (md5sig !== expectedSig) {
+        console.error("PayHere notify: invalid md5sig — possible spoofing attempt");
+        return res.status(400).send("Invalid signature");
+      }
+    }
+
+    // status_code 2 = SUCCESS, 0 = PENDING, -1 = CANCELLED, -2 = CHARGEBACK
     if (status_code === "2") {
-      await markPaymentSuccessService(order_id);
+      await markPaymentSuccessService(order_id, payment_id);
     } else {
       await markPaymentFailedService(order_id);
     }
@@ -120,6 +152,7 @@ export const payhereNotifyController = async (req, res) => {
     // PayHere requires a 200 OK response, otherwise it retries
     res.status(200).send("OK");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("PayHere notify error:", error.message);
+    res.status(400).send("Error");
   }
 };
