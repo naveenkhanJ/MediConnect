@@ -12,11 +12,11 @@ export const AppointmentProvider = {
     return res.data;
     },
 
-    //SEND DECISION 
-    updateAppointmentDecision: async (appointmentId, status) =>{
+    //SEND DECISION
+    updateAppointmentDecision: async (appointmentId, doctorId, status) =>{
         const res = await axios.patch(
         `${BASE_URL}/${appointmentId}/decision`,
-        {status}
+        { doctorId, status }
     );
     return res.data;
 
@@ -30,7 +30,7 @@ export const AppointmentProvider = {
     },
      getDoctorAppointments: async (doctorId) => {
     const res = await axios.get(
-      `${BASE_URL}/doctor/${doctorId}`
+      `${BASE_URL}/doctor/${doctorId}/today`
     );
     return res.data;
   }
