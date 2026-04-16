@@ -7,7 +7,7 @@ import AvailabilityCalendar from "../availability/AvailabilityCalendar";
 import DoctorProfile from "../doctorProfile/DoctorProfile";
 import PendingAppointments from "../pendingAppointments/page";
 //import DoctorTelemedicine from "../telemedicine/DoctorTelemedicine";
-import TodayAppointments from "../todayAppointments/todayAppointments";
+import TodayAppointments from "../todayAppointments/TodayAppointments";
 
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
