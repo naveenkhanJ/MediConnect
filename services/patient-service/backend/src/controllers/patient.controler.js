@@ -1,7 +1,8 @@
 //register a new patient
-
 import bcrypt from 'bcrypt';
 import pool from '../config/db.js';
+import dotenv from "dotenv";
+dotenv.config();
 
 
 const registerPatient = async (req, res) => {
@@ -21,6 +22,9 @@ const registerPatient = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
+//patient login
+
+
 
 //view profile of a patient
 

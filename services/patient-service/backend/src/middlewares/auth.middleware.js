@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
+import dotenv from "dotenv";
+dotenv.config();
+const jwtSecret = process.env.JWT_SECRET;
 
-const jwtSecret = process.env.JWT_SECRET || 'supersecretkey';
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
