@@ -17,7 +17,7 @@ app.use('/api/patients', patientRoutes);
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => console.log(`patient Service running on ${PORT}`));
 
-
+ 
 
 const testDB = async () => {
   try {

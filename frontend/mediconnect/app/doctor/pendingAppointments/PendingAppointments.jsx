@@ -1,22 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 
 export default function PendingAppointments() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/appointments/doctor/bb910126-bc62-4d81-8c8f-641325b178e1/pending", {
-      headers: { Authorization: "mock-token" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setAppointments(data);
-        else if (data?.appointments) setAppointments(data.appointments);
-        else setAppointments([]);
-      })
-      .catch((err) => console.error(err));
+    apiFetch("/api/doctor/appointments/pending", { auth: true })
+      .then(setAppointments)
+      .catch((err) => alert(err?.message || "Failed to load appointments"));
   }, []);
+
+  const updateStatus = async (id, status) => {
+    await apiFetch(`/api/doctor/appointments/${id}/decision`, {
+      method: "PATCH",
+      auth: true,
+      body: JSON.stringify({ status }),
+    });
+
+    setAppointments((prev) =>
+      prev.filter((a) => a.id !== id)
+    );
+  };
 
   return (
     <div className="bg-white p-5 rounded shadow">

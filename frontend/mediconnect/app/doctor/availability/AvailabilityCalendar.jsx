@@ -6,7 +6,9 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 
-const API = "http://localhost:4000/api/availability";
+import { apiUrl } from "@/lib/api";
+
+const API = apiUrl("/api/availability");
 
 export default function AvailabilityCalendar() {
   const [events, setEvents] = useState([]);
@@ -25,7 +27,11 @@ export default function AvailabilityCalendar() {
 
   const fetchAvailability = async () => {
     try {
-      const res = await axios.get(API);
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const res = await axios.get(API, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
 
       const now = new Date();
 
@@ -70,12 +76,18 @@ export default function AvailabilityCalendar() {
     }
 
     try {
-      await axios.post(API, {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.post(
+        API,
+        {
         //doctorId,
         date: start.toISOString().split("T")[0],
         startTime: start.toTimeString().slice(0, 5),
         endTime: end.toTimeString().slice(0, 5),
-      });
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
 
       fetchAvailability();
     } catch (err) {
@@ -95,7 +107,11 @@ export default function AvailabilityCalendar() {
     if (!confirm("Delete this slot?")) return;
 
     try {
-      await axios.delete(`${API}/${info.event.id}`);
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.delete(`${API}/${info.event.id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       fetchAvailability();
     } catch (err) {
       console.log(err.message);
@@ -122,12 +138,18 @@ export default function AvailabilityCalendar() {
     }
 
     try {
-      await axios.put(`${API}/${info.event.id}`, {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.put(
+        `${API}/${info.event.id}`,
+        {
         //doctorId,
         date: start.toISOString().split("T")[0],
         startTime: start.toTimeString().slice(0, 5),
         endTime: end.toTimeString().slice(0, 5),
-      });
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
 
       fetchAvailability();
     } catch (err) {
@@ -150,12 +172,18 @@ export default function AvailabilityCalendar() {
     const end = new Date(info.event.end);
 
     try {
-      await axios.put(`${API}/${info.event.id}`, {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      await axios.put(
+        `${API}/${info.event.id}`,
+        {
        // doctorId,
         date: start.toISOString().split("T")[0],
         startTime: start.toTimeString().slice(0, 5),
         endTime: end.toTimeString().slice(0, 5),
-      });
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
 
       fetchAvailability();
     } catch (err) {

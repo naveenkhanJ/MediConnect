@@ -9,6 +9,10 @@ const registerPatient = async (req, res) => {
   try {
     const { name, email, password, age,gender,contact } = req.body;
 
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ message: 'Password is required' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
@@ -88,6 +92,26 @@ const uploadReport = async (req, res) => {
   }
 };
 
+//view reports for logged-in patient
+const getReports = async (req, res) => {
+  try {
+    const patient_id = req.patient.id;
+
+    const result = await pool.query(
+      `SELECT id, patient_id, report_name, file_url, description
+       FROM reports
+       WHERE patient_id=$1
+       ORDER BY id DESC`,
+      [patient_id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 //book an appointment for a patient
 const bookAppointment = async (req, res) => {
   const patient_id = req.patient.id;
@@ -113,6 +137,44 @@ const getPrescriptions = async (req, res) => {
   );
 
   res.json(result.rows);
+};
+
+//delete patient account (and related data)
+const deleteAccount = async (req, res) => {
+  const { id } = req.params;
+
+  if (String(req.patient?.id) !== String(id)) {
+    return res.status(403).json({ message: 'Forbidden. You can only delete your own account.' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Avoid FK constraint errors if cascades aren't set.
+    await client.query('DELETE FROM reports WHERE patient_id=$1', [id]);
+    await client.query('DELETE FROM appointments WHERE patient_id=$1', [id]);
+    await client.query('DELETE FROM prescriptions WHERE patient_id=$1', [id]);
+
+    const deleted = await client.query(
+      'DELETE FROM patients WHERE id=$1 RETURNING id, name, email',
+      [id]
+    );
+
+    await client.query('COMMIT');
+
+    if (deleted.rows.length === 0) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    res.json({ message: 'Account deleted successfully', patient: deleted.rows[0] });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error(err.message);
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
 };
 
 //create doctor appointment
@@ -165,4 +227,4 @@ const getPatientContactInternal = async (req, res) => {
   }
 };
 
-export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment, getPatientContactInternal };
+export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment,deleteAccount,getReports };
