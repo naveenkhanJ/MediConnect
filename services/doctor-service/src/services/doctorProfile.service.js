@@ -1,14 +1,13 @@
 import { doctorProfileRepository } from "../repositories/doctorProfile.repository.js";
 
 //create profile
-export const createProfileService = async(doctorId, data) =>{
-    const existing = await doctorProfileRepository.findByDoctorId(doctorId);
+export const createProfileService = async( data) =>{
+    const existing = await doctorProfileRepository.findByEmail(data.email);
 
     if (existing)
         throw new Error ("Profile already exists");
 
     return await doctorProfileRepository.create({
-    doctorId,
     ...data,
     isVerified: false
     });
@@ -37,7 +36,8 @@ export const updateProfileService = async(doctorId,data) => {
       //remove immutable field
       delete data.speciality;
       delete data.licenseNumber;
-      
+      delete data.email; 
+      delete data.password; 
 
     return await doctorProfileRepository.updateDoctorById(doctorId,data);
 

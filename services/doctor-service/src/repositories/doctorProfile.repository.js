@@ -11,7 +11,9 @@ export const doctorProfileRepository = {
   },
 
   findAll: async () => {
-    return await Doctor.findAll({ order: [["fullName", "ASC"]] });
+    return await Doctor.findAll({
+      order: [["fullName", "ASC"]],
+    });
   },
 
   findBySpeciality: async (speciality) => {
@@ -20,7 +22,7 @@ export const doctorProfileRepository = {
       order: [["fullName", "ASC"]]
     });
   },
-  
+
   findByEmail: async (email) => {
   return await Doctor.findOne({ where: { email } });
   },

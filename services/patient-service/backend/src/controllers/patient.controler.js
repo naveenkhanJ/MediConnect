@@ -209,14 +209,22 @@ const createDoctorAppointment = async (req, res) => {
 };
 
 
-export {
-  registerPatient,
-  getProfile,
-  updateProfile,
-  uploadReport,
-  getReports,
-  bookAppointment,
-  getPrescriptions,
-  deleteAccount,
-  createDoctorAppointment
+// Internal service-to-service: returns email + contact (phone) for a given patient id
+// No JWT required — only reachable within the private service network
+const getPatientContactInternal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      'SELECT id, name, email, contact FROM patients WHERE id=$1',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
+
+export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment, getPatientContactInternal };

@@ -7,24 +7,28 @@ import { apiUrl } from "@/lib/api";
 import AvailabilityCalendar from "../availability/AvailabilityCalendar";
 import DoctorProfile from "../doctorProfile/DoctorProfile";
 import PendingAppointments from "../pendingAppointments/PendingAppointments";
+import DoctorTelemedicine from "../telemedicine/DoctorTelemedicine";
+import TodayAppointments from "../todayAppointments/TodayAppointments";
 
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [summary, setSummary] = useState(null);
-
-  const doctorId = "doc124"; // fakeAuth
 
   useEffect(() => {
     fetchSummary();
   }, []);
 
   const fetchSummary = async () => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const res = await axios.get(apiUrl("/api/dashboard/summary"), {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    setSummary(res.data);
+    try {
+      const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
+        headers: {
+          Authorization: "mock-token",
+        },
+      });
+      setSummary(res.data);
+    } catch (err) {
+      console.error("Failed to load dashboard summary:", err.message);
+    }
   };
 
   const menu = [
@@ -32,6 +36,8 @@ export default function DoctorDashboard() {
     { key: "availability", label: "Availability" },
     { key: "profile", label: "Doctor Profile" },
     { key: "appointments", label: "Pending Appointments" },
+    { key: "today", label: "Today's Appointments" },
+    { key: "telemedicine", label: "Telemedicine" },
   ];
 
   return (
@@ -86,7 +92,9 @@ export default function DoctorDashboard() {
 
         {activeTab === "availability" && <AvailabilityCalendar />}
         {activeTab === "profile" && <DoctorProfile />}
-        {activeTab === "appointments" && <PendingAppointments />}
+        { activeTab === "appointments" && <PendingAppointments /> }
+        { activeTab === "today" && <TodayAppointments /> }
+        { activeTab === "telemedicine" && <DoctorTelemedicine /> }
       </div>
     </div>
   );

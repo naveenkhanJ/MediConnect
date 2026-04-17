@@ -297,7 +297,8 @@ app.put('/api/payments/:id/fail', async (req, res) => {
 
 //_______________________doctor routes ______________________
 
-const DOCTOR_SERVICE_URL = "http://localhost:5009"; 
+const DOCTOR_SERVICE_URL = "http://localhost:5009";
+const TELEMEDICINE_SERVICE_URL = process.env.TELEMEDICINE_SERVICE_URL || "http://localhost:5005";
 
 // Create doctor profile
 // Frontend calls:POST /api/profile
@@ -603,112 +604,105 @@ app.get("/api/doctors/patients/:patientId/reports", async (req, res) => {
     );
   }
 });
+// ─── TELEMEDICINE ROUTES (proxied directly to telemedicine-service:5005) ─────
+// Auth: telemedicine-service reads X-User-Id / X-User-Role headers
+
 // Create session
-//Frontend calls: POST  /api/telemedicine
+// Frontend calls: POST /api/telemedicine
 app.post("/api/telemedicine", async (req, res) => {
   try {
     const response = await axios.post(
-      `${DOCTOR_SERVICE_URL}/api/telemedicine`,
+      `${TELEMEDICINE_SERVICE_URL}/api/telemedicine`,
       req.body,
       {
         headers: {
-          Authorization: req.headers.authorization || ""
+          "x-user-id": req.headers["x-user-id"] || "1",
+          "x-user-role": req.headers["x-user-role"] || "DOCTOR",
         }
       }
     );
-
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 
 // Join session
-//Frontend calls: POST /api/telemedicine/:id/join
+// Frontend calls: POST /api/telemedicine/:id/join
 app.post("/api/telemedicine/:id/join", async (req, res) => {
   try {
     const response = await axios.post(
-      `${DOCTOR_SERVICE_URL}/api/telemedicine/${req.params.id}/join`,
+      `${TELEMEDICINE_SERVICE_URL}/api/telemedicine/${req.params.id}/join`,
       {},
       {
         headers: {
-          Authorization: req.headers.authorization || ""
+          "x-user-id": req.headers["x-user-id"] || "1",
+          "x-user-role": req.headers["x-user-role"] || "PATIENT",
         }
       }
     );
-
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 
 // Start session
-//Frontend calls: PATCH /api/telemedicine/:id/start
+// Frontend calls: PATCH /api/telemedicine/:id/start
 app.patch("/api/telemedicine/:id/start", async (req, res) => {
   try {
     const response = await axios.patch(
-      `${DOCTOR_SERVICE_URL}/api/telemedicine/${req.params.id}/start`,
+      `${TELEMEDICINE_SERVICE_URL}/api/telemedicine/${req.params.id}/start`,
       {},
       {
         headers: {
-          Authorization: req.headers.authorization || ""
+          "x-user-id": req.headers["x-user-id"] || "1",
+          "x-user-role": req.headers["x-user-role"] || "DOCTOR",
         }
       }
     );
-
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 
 // End session
-//Frontend calls: PATCH /api/telemedicine/:id/end
+// Frontend calls: PATCH /api/telemedicine/:id/end
 app.patch("/api/telemedicine/:id/end", async (req, res) => {
   try {
     const response = await axios.patch(
-      `${DOCTOR_SERVICE_URL}/api/telemedicine/${req.params.id}/end`,
+      `${TELEMEDICINE_SERVICE_URL}/api/telemedicine/${req.params.id}/end`,
       {},
       {
         headers: {
-          Authorization: req.headers.authorization || ""
+          "x-user-id": req.headers["x-user-id"] || "1",
+          "x-user-role": req.headers["x-user-role"] || "DOCTOR",
         }
       }
     );
-
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 
-// Get session by appointment
-//Frontend calls: GET /api/telemedicine/appointment/:appointmentId
+// Get session by appointment ID
+// Frontend calls: GET /api/telemedicine/appointment/:appointmentId
 app.get("/api/telemedicine/appointment/:appointmentId", async (req, res) => {
   try {
     const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/telemedicine/appointment/${req.params.appointmentId}`,
+      `${TELEMEDICINE_SERVICE_URL}/api/telemedicine/appointment/${req.params.appointmentId}`,
       {
         headers: {
-          Authorization: req.headers.authorization || ""
+          "x-user-id": req.headers["x-user-id"] || "1",
+          "x-user-role": req.headers["x-user-role"] || "PATIENT",
         }
       }
     );
-
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 

@@ -33,6 +33,7 @@ export default function MyAppointmentsPage() {
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState(null);
   const [payingId, setPayingId] = useState(null);
+  const [joiningId, setJoiningId] = useState(null);
   // Map of appointmentId → live status (for real-time polling)
   const [liveStatus, setLiveStatus] = useState({});
 
@@ -136,10 +137,64 @@ export default function MyAppointmentsPage() {
     }
   };
 
+  // Fetch or create a telemedicine session for the appointment, then navigate to the video call page
+  const handleJoinVideoCall = async (appt) => {
+    setJoiningId(appt.id);
+    try {
+      // Try to fetch an existing session first
+      let sessionId = null;
+      const getRes = await fetch(
+        `http://localhost:4000/api/telemedicine/appointment/${appt.id}`,
+        {
+          headers: {
+            "x-user-id": user?.id || "1",
+            "x-user-role": "PATIENT",
+          },
+        }
+      );
+
+      if (getRes.ok) {
+        const getData = await getRes.json();
+        sessionId = getData?.data?.id ?? getData?.id ?? null;
+      }
+
+      // If no session yet, create one
+      if (!sessionId) {
+        const createRes = await fetch("http://localhost:4000/api/telemedicine", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id || "1",
+            "x-user-role": "PATIENT",
+          },
+          body: JSON.stringify({ appointmentId: appt.id }),
+        });
+        const createData = await createRes.json();
+        if (!createRes.ok) {
+          alert(createData.message || "Could not create video session.");
+          return;
+        }
+        sessionId = createData?.data?.id ?? createData?.id ?? null;
+      }
+
+      if (!sessionId) {
+        alert("Could not retrieve video session.");
+        return;
+      }
+
+      router.push(`/video-call/${sessionId}`);
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setJoiningId(null);
+    }
+  };
+
   const getDisplayStatus = (appt) => liveStatus[appt.id] || appt.status;
 
   const canCancel = (status) => ["PENDING_PAYMENT", "CONFIRMED", "RESCHEDULED"].includes(status);
   const canReschedule = (status) => ["CONFIRMED", "RESCHEDULED"].includes(status);
+  const canJoinVideo = (appt, status) => status === "CONFIRMED" && appt.consultationType === "ONLINE";
 
   if (loading) {
     return (
@@ -262,6 +317,18 @@ export default function MyAppointmentsPage() {
                         className="px-4 py-1.5 bg-yellow-500 text-white rounded-full text-xs font-medium hover:bg-yellow-600 transition disabled:opacity-50"
                       >
                         {payingId === appt.id ? "Loading..." : "Pay Now"}
+                      </button>
+                    )}
+                    {canJoinVideo(appt, displayStatus) && (
+                      <button
+                        onClick={() => handleJoinVideoCall(appt)}
+                        disabled={joiningId === appt.id}
+                        className="px-4 py-1.5 bg-[#5F6FFF] text-white rounded-full text-xs font-medium hover:bg-[#4a5ce6] transition disabled:opacity-50 flex items-center gap-1.5"
+                      >
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
+                        </svg>
+                        {joiningId === appt.id ? "Joining..." : "Join Video Call"}
                       </button>
                     )}
                     {canReschedule(displayStatus) && (

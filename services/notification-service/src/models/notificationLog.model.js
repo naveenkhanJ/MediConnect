@@ -5,7 +5,7 @@ const NotificationLog = sequelize.define(
   "NotificationLog",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    channel: { type: DataTypes.ENUM("EMAIL", "SMS"), allowNull: false },
+    channel: { type: DataTypes.ENUM("EMAIL", "SMS", "WHATSAPP"), allowNull: false },
     toAddress: { type: DataTypes.STRING, allowNull: false },
     subject: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
