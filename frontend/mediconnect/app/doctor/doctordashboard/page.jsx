@@ -20,9 +20,10 @@ export default function DoctorDashboard() {
 
   const fetchSummary = async () => {
     try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
         headers: {
-          Authorization: "mock-token",
+          Authorization: token ? `Bearer ${token}` : "",
         },
       });
       setSummary(res.data);

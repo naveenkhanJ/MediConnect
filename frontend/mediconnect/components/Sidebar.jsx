@@ -1,10 +1,9 @@
 "use client";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
   MessageSquare,
-  User,
   Settings,
   Heart,
   KeyRound,
@@ -12,6 +11,8 @@ import {
 } from "lucide-react";
 
 export default function Sidebar({ activeTab, setActiveTab }) {
+  const [patient, setPatient] = useState(null);
+
   const menu = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Appointment List", icon: CalendarDays },
@@ -21,47 +22,68 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { name: "Logout", icon: LogOut },
   ];
 
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+
+        if (!user?.id || !token) return;
+
+        const res = await fetch(`http://localhost:4000/patients/${user.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        setPatient(data.data ? data.data : data);
+      } catch (err) {
+        console.error("Sidebar fetch error:", err);
+      }
+    };
+
+    fetchPatient();
+  }, []);
+
   return (
     <div className="w-72 bg-white min-h-screen rounded-lg shadow-sm p-4 ml-30 mr-10 mt-20">
-      
-      {/* 🔵 Top Banner */}
+
+      {/* Top Banner */}
       <div className="relative rounded-xl overflow-hidden mb-14">
         <div className="h-28 bg-[#5F6FFF] flex items-center justify-center">
-          {/* Optional pattern overlay */}
-          <div className="absolute inset-0 opacity-10  bg-repeat"></div>
+          <div className="absolute inset-0 opacity-10 bg-repeat"></div>
         </div>
 
-        {/* 👤 Profile Image */}
-        <div className="absolute left-1/2 -bottom-10 transform -translate-x-1/2 ">
+        {/* Profile Image */}
+        <div className="absolute left-1/2 -bottom-10 transform -translate-x-1/2">
           <img
-            src="/images/man.png" 
+            src="/images/man.png"
             alt="profile"
             className="w-20 h-20 rounded-full border-4 border-white object-cover shadow"
           />
         </div>
       </div>
 
-      {/* 👤 Name + Status */}
+      {/* Name + Status */}
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2">
           <h2 className="font-semibold text-gray-800">
-            Emily Rival
+            {patient ? patient.name : "Loading..."}
           </h2>
-
-          {/* status badge */}
           <span className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center">
             <span className="w-2 h-2 bg-[#5F6FFF] rounded-full"></span>
           </span>
         </div>
 
-        {/* role badge */}
         <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-white border rounded-full text-sm text-gray-600 shadow-sm">
           <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
           Patient
         </div>
       </div>
 
-      {/* 📌 Navigation */}
+      {/* Navigation */}
       <div className="space-y-2">
         {menu.map((item) => {
           const Icon = item.icon;
@@ -72,11 +94,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
               key={item.name}
               onClick={() => setActiveTab(item.name)}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition
-                ${
-                  isActive
-                    ? "bg-[#5F6FFF] text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
+                ${isActive ? "bg-[#5F6FFF] text-white" : "text-gray-700 hover:bg-gray-100"}`}
             >
               <Icon size={18} />
               <span className="text-sm font-medium">{item.name}</span>

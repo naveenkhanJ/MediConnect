@@ -14,11 +14,12 @@ export default function RegisterPage() {
     gender: "",
     birthday: "",
     licenseNo: "",
-    category: "",
     fees: "",
-    specialization: "",
+    speciality: "",
     experience: "",
+    bio: "",
     image: null,
+    consultationType: "ONLINE",
   });
 
   const handleChange = (e) => {
@@ -45,6 +46,14 @@ export default function RegisterPage() {
           gender: form.gender,
           contact: form.phone,
           role,
+          // Doctor specific fields (if role is doctor)
+          license_no: form.licenseNo,
+          speciality: form.speciality,
+          fees: form.fees,
+          experience: form.experience,
+          consultationType: form.consultationType,
+          bio: form.bio || "",
+          image: form.image ? form.image.name : null 
         })
       });
 
@@ -203,54 +212,87 @@ export default function RegisterPage() {
           {role === "doctor" && (
             <>
               <div>
-                <label className="text-sm text-gray-600">License No</label>
+                <label className="text-sm font-semibold text-gray-600">License No</label>
                 <input
                   name="licenseNo"
                   value={form.licenseNo}
                   onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  placeholder="e.g. SLMC-12345"
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition"
+                  required
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-600">Category</label>
-                <input
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 border rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-600">Fees</label>
+                <label className="text-sm font-semibold text-gray-600">Consultation Fees (LKR)</label>
                 <input
                   type="number"
                   name="fees"
                   value={form.fees}
                   onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  placeholder="e.g. 2500"
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition"
+                  required
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-600">Specialization</label>
-                <input
-                  name="specialization"
-                  value={form.specialization}
+                <label className="text-sm font-semibold text-gray-600">Speciality</label>
+                <select
+                  name="speciality"
+                  value={form.speciality}
                   onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 border rounded-lg"
-                />
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition appearance-none bg-white"
+                  required
+                >
+                  <option value="">Select Speciality</option>
+                  <option value="General physician">General physician</option>
+                  <option value="Gynecologist">Gynecologist</option>
+                  <option value="Dermatologist">Dermatologist</option>
+                  <option value="Pediatricians">Pediatricians</option>
+                  <option value="Neurologist">Neurologist</option>
+                  <option value="Gastroenterologist">Gastroenterologist</option>
+                </select>
               </div>
 
               <div className="md:col-span-2">
-                <label className="text-sm text-gray-600">Experience</label>
+                <label className="text-sm font-semibold text-gray-600">Experience</label>
                 <input
                   name="experience"
                   value={form.experience}
                   onChange={handleChange}
-                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  placeholder="e.g. 5 Years"
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition"
+                  required
                 />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Consultation Availability</label>
+                <select
+                  name="consultationType"
+                  value={form.consultationType}
+                  onChange={handleChange}
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition appearance-none bg-white"
+                  required
+                >
+                  <option value="ONLINE">💻 Online Only</option>
+                  <option value="PHYSICAL">🏥 In-Person Only</option>
+                  <option value="BOTH">🔄 Both Available</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-semibold text-gray-600">Professional Bio</label>
+                <textarea
+                  name="bio"
+                  value={form.bio}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="Briefly describe your medical background and expertise..."
+                  className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5F6FFF] transition"
+                  required
+                ></textarea>
               </div>
 
               {/* 🖼️ IMAGE UPLOAD */}

@@ -2,28 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
-   const router = useRouter();
-  useEffect(() => {
-    fetch("http://localhost:4000/api/appointments/doctor/bb910126-bc62-4d81-8c8f-641325b178e1/today", {
-      headers: { Authorization: "mock-token" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("API RESPONSE 👉", data);
+  const router = useRouter();
 
-        // FIX: ensure it's always an array
-        if (Array.isArray(data)) {
-          setAppointments(data);
-        } else if (data?.appointments) {
-          setAppointments(data.appointments);
-        } else {
-          setAppointments([]);
-        }
+  useEffect(() => {
+    apiFetch("/api/doctor/appointments/today", { auth: true })
+      .then((data) => {
+        if (Array.isArray(data)) setAppointments(data);
+        else if (data?.appointments) setAppointments(data.appointments);
+        else setAppointments([]);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        if (err.status === 403) setAppointments([]);
+        else console.error("Today appointments error:", err.message);
+      });
   }, []);
 
   return (

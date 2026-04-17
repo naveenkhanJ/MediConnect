@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PaymentSuccessPage() {
+  const router = useRouter();
   const [appointment, setAppointment] = useState(null);
   const [status, setStatus] = useState("verifying"); // "verifying" | "confirmed" | "timeout"
 
@@ -47,6 +49,7 @@ export default function PaymentSuccessPage() {
             setStatus("confirmed");
             localStorage.removeItem("pendingPayment");
             localStorage.removeItem("pendingAppointment");
+            setTimeout(() => router.push("/patient-dashboard"), 2000);
             return;
           }
         } catch {
@@ -113,7 +116,7 @@ export default function PaymentSuccessPage() {
             )}
 
             <Link
-              href="/my-appointments"
+              href="/patient-dashboard"
               className="block w-full bg-[#5F6FFF] text-white py-3 rounded-lg font-medium hover:opacity-90 transition mb-3"
             >
               View My Appointments

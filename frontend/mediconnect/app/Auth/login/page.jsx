@@ -40,9 +40,9 @@ export default function LoginPage() {
       if (role === 'admin') {
         window.location.href = '/admin/dashboard';
       } else if (role === 'doctor') {
-        window.location.href = '/doctor/dashboard';
+        window.location.href = '/doctor/doctordashboard';
       } else if (role === 'patient') {
-        window.location.href = '/';
+        window.location.href = '/patient-dashboard';
       } else {
         window.location.href = '/';
       }

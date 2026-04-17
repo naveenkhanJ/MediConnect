@@ -64,14 +64,19 @@ export default function AvailabilityCalendar() {
   };
 
   // ================= CREATE =================
+  // Helper: format date as YYYY-MM-DD using LOCAL timezone (not UTC)
+  const localDateStr = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
   const handleDateSelect = async (info) => {
     info.view.calendar.unselect();
     const start = new Date(info.start);
     const end = new Date(info.end);
 
-    // block past
-    if (start < new Date()) {
-      alert("Cannot create past slots");
+    // block past slots (with 5-min grace)
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+    if (start < fiveMinAgo) {
+      alert("Cannot create slots in the past");
       return;
     }
 
@@ -81,10 +86,9 @@ export default function AvailabilityCalendar() {
       await axios.post(
         API,
         {
-        //doctorId,
-        date: start.toISOString().split("T")[0],
-        startTime: start.toTimeString().slice(0, 5),
-        endTime: end.toTimeString().slice(0, 5),
+          date: localDateStr(start),
+          startTime: start.toTimeString().slice(0, 5),
+          endTime: end.toTimeString().slice(0, 5),
         },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
@@ -143,10 +147,9 @@ export default function AvailabilityCalendar() {
       await axios.put(
         `${API}/${info.event.id}`,
         {
-        //doctorId,
-        date: start.toISOString().split("T")[0],
-        startTime: start.toTimeString().slice(0, 5),
-        endTime: end.toTimeString().slice(0, 5),
+          date: localDateStr(start),
+          startTime: start.toTimeString().slice(0, 5),
+          endTime: end.toTimeString().slice(0, 5),
         },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
@@ -177,10 +180,9 @@ export default function AvailabilityCalendar() {
       await axios.put(
         `${API}/${info.event.id}`,
         {
-       // doctorId,
-        date: start.toISOString().split("T")[0],
-        startTime: start.toTimeString().slice(0, 5),
-        endTime: end.toTimeString().slice(0, 5),
+          date: localDateStr(start),
+          startTime: start.toTimeString().slice(0, 5),
+          endTime: end.toTimeString().slice(0, 5),
         },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
