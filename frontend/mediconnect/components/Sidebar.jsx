@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -32,9 +32,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         </div>
 
         {/* 👤 Profile Image */}
-        <div className="absolute left-1/2 -bottom-10 transform -translate-x-1/2">
+        <div className="absolute left-1/2 -bottom-10 transform -translate-x-1/2 ">
           <img
-            src="/profile.jpg" 
+            src="/images/man.png" 
             alt="profile"
             className="w-20 h-20 rounded-full border-4 border-white object-cover shadow"
           />
