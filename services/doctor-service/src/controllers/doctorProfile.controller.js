@@ -8,8 +8,8 @@ export const createProfileController = async(req,res) =>{
       image: req.file ? req.file.originalname : null 
     };
 
-
-        const profile = await createProfileService(req.body);
+        // Use the 'data' object which contains the processed image filename
+        const profile = await createProfileService(data);
 
         res.status(201).json(profile);
 

@@ -1,18 +1,11 @@
-import axios from "axios";
+import { AppointmentProvider } from "../providers/appointment.provider.js";
 
-const APPOINTMENT_SERVICE_URL =
-  process.env.APPOINTMENT_SERVICE_URL || "http://localhost:5003";
-
-  // ─── GET today's confirmed appointments ──────────────────────────────────────
+// ─── GET today's confirmed appointments ──────────────────────────────────────
 export const getTodayAppointmentsController = async (req, res) => {
   try {
     const doctorId = req.user.id;
-
-    const response = await axios.get(
-      `${APPOINTMENT_SERVICE_URL}/api/appointments/doctor/${doctorId}/today`
-    );
-
-    res.json(response.data);
+    const appointments = await AppointmentProvider.getDoctorAppointments(doctorId);
+    res.json(appointments);
   } catch (err) {
     const status = err.response?.status || 500;
     res.status(status).json({ message: err.message });
@@ -23,34 +16,34 @@ export const getTodayAppointmentsController = async (req, res) => {
 export const getPendingAppointmentsController = async (req, res) => {
   try {
     const doctorId = req.user.id;
+    console.log("DOCTOR PENDING APPOINTMENTS REQUEST FOR ID:", doctorId);
 
-    const response = await axios.get(
-      `${APPOINTMENT_SERVICE_URL}/api/appointments/doctor/${doctorId}/pending`
-    );
+    const appointments = await AppointmentProvider.getPendingAppointments(doctorId);
+    console.log("FOUND PENDING APPOINTMENTS:", appointments.length);
 
-    res.json(response.data);
+    res.json(appointments);
   } catch (err) {
+    console.error("ERROR FETCHING PENDING:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
 
+// Approved / Reject appointment
 export const decideAppointmentController = async (req, res) => {
   try {
     const doctorId = req.user.id;
     const { appointmentId } = req.params;
     const { status } = req.body;
 
-    const response = await axios.patch(
-      `${APPOINTMENT_SERVICE_URL}/api/appointments/${appointmentId}/decision`,
-      {
-        doctorId,
-        status
-      }
+    const result = await AppointmentProvider.updateAppointmentDecision(
+      appointmentId,
+      doctorId,
+      status
     );
 
     res.json({
       message: `Appointment ${status} successfully`,
-      appointment: response.data
+      appointment: result
     });
   } catch (err) {
     res.status(400).json({ message: err.message });

@@ -15,14 +15,9 @@ export const requireVerifiedDoctor = async (req, res, next) => {
     // 3. Fetch REAL doctor profile using logged-in user
     const profile = await doctorProfileRepository.findByDoctorId(req.user.id);
 
-    if (!profile) {
-      return res.status(404).json({ message: "Doctor profile not found" });
-    }
-
-    // 4. Check verification status
-    if (!profile.isVerified) {
+    if (!profile || !profile.isVerified) {
       return res.status(403).json({
-        message: "Profile not verified. Access denied."
+        message: "Doctor account not yet verified. Please wait for admin approval."
       });
     }
 

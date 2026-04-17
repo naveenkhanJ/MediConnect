@@ -24,7 +24,7 @@ export const listDoctorsController = async (req, res) => {
 // GET /api/doctors/:id
 export const getDoctorByIdController = async (req, res) => {
   try {
-    const doctor = await doctorProfileRepository.findByDoctorId(req.params.id);
+    const doctor = await doctorProfileRepository.findByDoctorId(String(req.params.id));
     if (!doctor) return res.status(404).json({ message: "Doctor not found" });
 
     const { id, fullName, speciality, category, experience, consultationType, fees, image, bio, isVerified } = doctor;
@@ -37,11 +37,14 @@ export const getDoctorByIdController = async (req, res) => {
 // GET /api/doctors/:id/availability
 export const getDoctorAvailabilityController = async (req, res) => {
   try {
-    const today = new Date().toISOString().split("T")[0];
+    // Use local date to avoid UTC shifting issues (e.g. UTC+5:30 timezone)
+    const now = new Date();
+    const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
     const slots = await Availability.findAll({
       where: {
-        doctorId: req.params.id,
-        date: { [Op.gte]: today }
+        doctorId: String(req.params.id),
+        date: { [Op.gte]: localToday }
       },
       order: [["date", "ASC"], ["startTime", "ASC"]]
     });
