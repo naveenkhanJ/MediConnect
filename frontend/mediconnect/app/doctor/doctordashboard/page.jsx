@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "@/lib/api";
 
 import AvailabilityCalendar from "../availability/AvailabilityCalendar";
 import DoctorProfile from "../doctorProfile/DoctorProfile";

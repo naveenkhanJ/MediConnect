@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:4000/api/profile/me";
+import { apiUrl } from "@/lib/api";
+
+const API = apiUrl("/api/profile/me");
 
 export default function DoctorProfileAdvanced() {
   const [profile, setProfile] = useState(null);
@@ -17,7 +19,11 @@ export default function DoctorProfileAdvanced() {
 
   const loadProfile = async () => {
     try {
-      const res = await axios.get(API);
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const res = await axios.get(API, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       setProfile(res.data);
       setForm(res.data);
     } catch (err) {

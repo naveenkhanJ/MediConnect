@@ -19,7 +19,7 @@ export const doctorProfileRepository = {
   findBySpeciality: async (speciality) => {
     return await Doctor.findAll({
       where: { speciality },
-      order: [["fullName", "ASC"]],
+      order: [["fullName", "ASC"]]
     });
   },
 
