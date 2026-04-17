@@ -5,7 +5,7 @@ import { addAvailabilityService, deleteAvailabilityService, getDoctorAvailabilit
 //get all slots
 export const getAvailabilityController = async (req, res) => {
     try{
-        const slots = await getDoctorAvailabilityService( req.user.id);
+        const slots = await getDoctorAvailabilityService(String(req.user.id));
         res.json(slots);
     }catch(err){
         res.status(400).json({message: err.message});
@@ -16,7 +16,7 @@ export const getAvailabilityController = async (req, res) => {
 export const addAvailabilityController = async (req, res) => {
     try{
         const slot = await addAvailabilityService({
-            doctorId: req.user.id,
+            doctorId: String(req.user.id),
             ...req.body
         });
         res.status(201).json(slot);
@@ -27,14 +27,13 @@ export const addAvailabilityController = async (req, res) => {
 
 //update a slot
 export const updateAvailabilityController = async (req, res) => {
-
     try{
-        const slot = await updateAvailabilityService(req.params.id, 
+        const slot = await updateAvailabilityService(req.params.id,
             {
-                doctorId:req.user.id,
+                doctorId: String(req.user.id),
                 ...req.body
             }
-        ); 
+        );
         res.json(slot);
     }catch(err){
         res.status(400).json({message:err.message});
