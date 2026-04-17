@@ -1,16 +1,30 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
-import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports } from '../controllers/patient.controler.js';
+import { registerPatient, getMyProfile, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports, getAllPatientsInternal, getPatientContactInternal } from '../controllers/patient.controler.js';
 
 const router = express.Router();
+
+// Middleware for internal service-to-service calls
+const internalOnly = (req, res, next) => {
+  const secret = req.headers["x-internal-secret"];
+  if (secret !== (process.env.INTERNAL_SECRET || "mediconnect-internal")) {
+    return res.status(403).json({ message: "Forbidden." });
+  }
+  next();
+};
+
+// Internal service-to-service endpoints
+router.get('/internal/all', internalOnly, getAllPatientsInternal);
+router.get('/internal/:id', internalOnly, getPatientContactInternal);
 
 // Register a new patient
 router.post('/register', registerPatient);
 
-// Internal service-to-service endpoint — returns email + contact only, no user auth required
+// Get logged-in patient's own profile (must be before /:id to avoid route conflict)
+router.get('/me', authMiddleware, getMyProfile);
 
-// Get patient profile
+// Get patient profile by id
 router.get('/:id', authMiddleware, getProfile);
 
 // Update patient profile

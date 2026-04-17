@@ -21,7 +21,7 @@ export const getAppointmentById = async (appointmentId) => {
     return response.data.data;
   } catch (error) {
     logger.error("Error fetching appointment:", error.message);
-    
+
     // If appointment service is down, provide helpful error
     if (error.code === "ECONNREFUSED") {
       const helpError = new Error(
