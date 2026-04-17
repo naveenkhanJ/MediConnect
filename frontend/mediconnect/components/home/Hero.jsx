@@ -28,12 +28,24 @@ export default function Hero() {
           
           </p>
 
-          {/* Button */}
-          <Link href="/book-appointment">
-            <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
-              Schedule an appointment
-            </button>
-          </Link>
+          {/* Buttons */}
+          <div className="flex gap-4 flex-wrap">
+            
+            {/* Schedule Appointment */}
+            <Link href="/book-appointment">
+              <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
+                Schedule an appointment
+              </button>
+            </Link>
+
+            {/* Symptom Checker */}
+            <Link href="/symptom-checker">
+              <button className="bg-[#5F6FFF] text-white px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
+                Symptom Checker
+              </button>
+            </Link>
+
+          </div>
         
 
           {/* Stats */}

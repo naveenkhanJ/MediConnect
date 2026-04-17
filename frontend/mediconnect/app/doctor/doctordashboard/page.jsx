@@ -13,22 +13,22 @@ export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [summary, setSummary] = useState(null);
 
-  useEffect(() => {
-    fetchSummary();
-  }, []);
+  // useEffect(() => {
+  //   fetchSummary();
+  // }, []);
 
-  const fetchSummary = async () => {
-    try {
-      const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
-        headers: {
-          Authorization: "mock-token",
-        },
-      });
-      setSummary(res.data);
-    } catch (err) {
-      console.error("Failed to load dashboard summary:", err.message);
-    }
-  };
+  // const fetchSummary = async () => {
+  //   try {
+  //     const res = await axios.get("http://localhost:4000/api/dashboard/summary", {
+  //       headers: {
+  //         Authorization: "mock-token",
+  //       },
+  //     });
+  //     setSummary(res.data);
+  //   } catch (err) {
+  //     console.error("Failed to load dashboard summary:", err.message);
+  //   }
+  // };
 
   const menu = [
     { key: "dashboard", label: "Dashboard" },
