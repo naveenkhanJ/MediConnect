@@ -11,6 +11,7 @@ export const register = async (req, res) => {
 
       // common
       name,
+      fullName,
 
       // patient fields
       age,
@@ -19,9 +20,15 @@ export const register = async (req, res) => {
 
       // doctor fields
       specialization,
+      speciality,
+      consultationType,
       experience,
       license_no,
-      fees
+      licenseNumber,
+      phone,
+      fees,
+      bio,
+      image
     } = req.body;
 
     if (!email || !password || !role) {
@@ -55,23 +62,42 @@ export const register = async (req, res) => {
     }
 
     else if (role === "doctor") {
-      if (!name || !specialization || !experience || !license_no || !fees ||!contact ) {
+      // Support both legacy keys (name/contact/specialization/license_no)
+      // and new doctor-service model keys (fullName/phone/speciality/licenseNumber).
+      const resolvedFullName = fullName || name;
+      const resolvedPhone = phone || contact;
+      const resolvedSpeciality = speciality || specialization;
+      const resolvedLicenseNumber = licenseNumber || license_no;
+
+      if (
+        !resolvedFullName ||
+        !resolvedSpeciality ||
+        !resolvedLicenseNumber ||
+        resolvedPhone == null ||
+        fees == null
+      ) {
         return res.status(400).json({
           message: "Validation Error",
-          error: "name, specialization, experience, license_no, fees required for doctor"
+          error:
+            "fullName/name, speciality/specialization, licenseNumber/license_no, phone/contact, fees required for doctor"
         });
       }
 
-      await axios.post("http://localhost:5003/api/doctors/register", {
-        user_id: user.id,
+      // doctor-service runs on 5009 and uses `id` as the doctorId (UUID primary key).
+      await axios.post("http://localhost:5009/api/profile/register", {
+        id: user.id,
         email,
         password,
-        name,
-        specialization,
+        fullName: resolvedFullName,
+        phone: resolvedPhone,
+        speciality: resolvedSpeciality,
+        consultationType,
+        // keep experience for backward compatibility (doctor-service model may ignore it)
         experience,
-        license_no,
+        licenseNumber: resolvedLicenseNumber,
         fees,
-        contact
+        bio,
+        image
       });
     }
 

@@ -9,7 +9,6 @@ const router = express.Router();
 router.post('/register', registerPatient);
 
 // Internal service-to-service endpoint — returns email + contact only, no user auth required
-router.get('/internal/:id', getPatientContactInternal);
 
 // Get patient profile
 router.get('/:id', authMiddleware, getProfile);

@@ -59,15 +59,24 @@ app.get('/patients/:id', async (req, res) => {
 });
 
 
-
-
 //  PUT update a patient by ID
 app.put('/patients/:id', async (req, res) => {
   try {
-    const response = await axios.put(`${PATIENT_SERVICE}/api/patients/${req.params.id}`, req.body);
+    const response = await axios.put(
+      `${PATIENT_SERVICE}/api/patients/${req.params.id}`,
+      req.body,
+      {
+        headers: {
+          Authorization: req.headers.authorization, 
+        },
+      }
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
 

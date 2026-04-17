@@ -7,88 +7,67 @@ const Doctor = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
+      primaryKey: true,
     },
-
     fullName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true,
     },
 
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
-        isEmail: true
-      }
+        isEmail: true,
+      },
     },
 
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true,
     },
 
     phone: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-
-    address: {
-      type: DataTypes.TEXT
-    },
-
-    gender: {
-      type: DataTypes.ENUM("MALE", "FEMALE", "OTHER")
-    },
-
-    birthday: {
-      type: DataTypes.DATE
+      allowNull: true,
     },
 
     licenseNumber: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true,
     },
 
     speciality: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-
-    category: {
-      type: DataTypes.STRING // e.g. Specialist, Consultant
-    },
-
-    experience: {
-      type: DataTypes.INTEGER // years
+      allowNull: true,
     },
 
     consultationType: {
       type: DataTypes.ENUM("PHYSICAL", "ONLINE", "BOTH"),
-      allowNull: false
+      allowNull: true,
     },
 
     fees: {
-      type: DataTypes.FLOAT
+      type: DataTypes.FLOAT,
     },
 
     image: {
-      type: DataTypes.STRING // store URL
+      type: DataTypes.STRING, // store URL
     },
 
     bio: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
     },
 
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
-    }
+      defaultValue: false,
+    },
   },
   {
     tableName: "doctors",
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 export default Doctor;
