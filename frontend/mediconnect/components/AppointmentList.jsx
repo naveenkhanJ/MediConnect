@@ -2,62 +2,92 @@
 
 import { useState } from "react";
 import {
-  Search,
-  Calendar,
-  ChevronDown,
+ 
   Clock,
   Mail,
   Phone,
-  Eye,
   CalendarDays,
   MoreVertical,
 } from "lucide-react";
+import { filterAppointments } from "@/lib/appointmentListFilters";
 
 export default function AppointmentList() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const filters = [
-    { name: "All", count: 229 },
-    { name: "Confirmed", count: 179 },
-    { name: "Pending", count: 47 },
-    { name: "Cancelled", count: 3 },
+    { name: "All", count: 2 },
+    { name: "Confirmed", count: 1 },
+    { name: "Pending", count: 4 },
+    { name: "Cancelled", count: 1},
     { name: "Upcoming", count: 0 },
   ];
 
-  const appointments = [
+  const [appointments, setAppointments] = useState([
     {
-      id: "#6313",
+      id: "1",
       name: "Dr Darren Elder",
       department: "Cardiologist",
       date: "31 Mar 2026 8:00 pm",
       email: "patient@example.com",
       phone: "+94 77 123 4567",
       img: "/doc1.jpg",
+      status: "Confirmed",
     },
     {
-      id: "#6314",
+      id: "2",
       name: "Dr Darren Elder",
       department: "Cardiologist",
       date: "31 Mar 2026 11:20 am",
       email: "patient@example.com",
       phone: "+94 77 123 4567",
       img: "/doc1.jpg",
+      status: "Pending",
     },
     {
-      id: "#6315",
+      id: "3",
       name: "Dr Anya Sharma",
       department: "Dentist",
       date: "01 Apr 2026 9:00 am",
       email: "patient@example.com",
       phone: "+94 77 123 4567",
       img: "/doc2.jpg",
+      status: "Cancelled",
     },
-  ];
+  ]);
+
+  const filteredAppointments = filterAppointments(appointments, {
+    searchQuery,
+    activeFilter,
+    selectedDate,
+  });
 
   return (
     <div className="p-6 bg-white mt-20">
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="Search appointments..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+        />
+        {searchQuery ? (
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="text-sm text-gray-600 underline"
+          >
+            Clear
+          </button>
+        ) : null}
+      </div>
 
-      {/* 🔵 Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <span className="w-3 h-3 bg-[#5F6FFF] rounded-full"></span>
         <h1 className="text-2xl font-bold text-gray-800">
@@ -65,30 +95,13 @@ export default function AppointmentList() {
         </h1>
       </div>
 
-      {/* 🔍 Search + Clear */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex items-center bg-white border rounded-full px-4 py-2 w-full max-w-md">
-          <input
-            type="text"
-            placeholder="Type to search doctor..."
-            className="flex-1 outline-none text-sm"
-          />
-          <Search size={18} className="text-gray-400" />
-        </div>
-
-        <button className="bg-[#5F6FFF] text-white px-5 py-2 rounded-full text-sm">
-          Clear
-        </button>
-      </div>
-
-      {/* 🧭 Filters + Date */}
+      {/* Filters */}
       <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
-
-        {/* Filters */}
         <div className="flex gap-2 flex-wrap">
           {filters.map((item) => (
             <button
               key={item.name}
+              type="button"
               onClick={() => setActiveFilter(item.name)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm
                 ${
@@ -112,27 +125,33 @@ export default function AppointmentList() {
           ))}
         </div>
 
-        {/* Date selector */}
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 border bg-white px-4 py-2 rounded-full text-sm">
-            <Calendar size={16} />
-            Select Date
-            <ChevronDown size={16} />
-          </button>
-
-          <button className="w-10 h-10 flex items-center justify-center border rounded-full bg-white">
-            <CalendarDays size={18} />
-          </button>
+        <div className="flex flex-wrap gap-2 items-center">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+          {selectedDate ? (
+            <button
+              type="button"
+              onClick={() => setSelectedDate("")}
+              className="text-sm text-gray-600 underline"
+            >
+              Clear
+            </button>
+          ) : null}
         </div>
       </div>
 
-      {/* 📋 Appointment Cards */}
+      {/* Appointment Cards */}
       <div className="space-y-4">
-        {appointments.map((item) => (
+        {filteredAppointments.map((item) => (
           <div
             key={item.id}
             className="bg-white border border-gray-200 rounded-xl p-4 flex justify-between items-center flex-wrap gap-4"
           >
+
             {/* Col 1 */}
             <div className="flex items-center gap-3 min-w-[200px]">
               <img
@@ -142,7 +161,7 @@ export default function AppointmentList() {
               />
               <div>
                 <p className="text-[#5F6FFF] text-sm font-semibold">
-                  {item.id}
+                  #{item.id}
                 </p>
                 <h2 className="font-semibold text-gray-800">
                   {item.name}
@@ -175,19 +194,109 @@ export default function AppointmentList() {
 
             {/* Col 4 */}
             <div className="flex items-center gap-3">
-              <button className="p-2 rounded-full hover:bg-gray-100">
-                <Eye size={18} />
-              </button>
+
+              {/* Status */}
+              <span
+                className={`px-3 py-1 text-xs rounded-full font-medium
+                  ${
+                    item.status === "Confirmed"
+                      ? "bg-green-100 text-green-600"
+                      : item.status === "Pending"
+                      ? "bg-yellow-100 text-yellow-600"
+                      : "bg-red-100 text-red-600"
+                  }`}
+              >
+                {item.status}
+              </span>
+
               <button className="p-2 rounded-full hover:bg-gray-100">
                 <CalendarDays size={18} />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100">
+
+              <button
+                onClick={() => {
+                  setSelectedAppointment(item);
+                  setShowCancelPopup(true);
+                }}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
                 <MoreVertical size={18} />
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Cancel Popup */}
+      {showCancelPopup && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-lg font-semibold mb-4">
+              Cancel Appointment
+            </h2>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to cancel #{selectedAppointment?.id}?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowCancelPopup(false)}
+                className="px-4 py-2 border rounded-md"
+              >
+                No
+              </button>
+
+              <button
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem("token");
+
+                    const res = await fetch(
+                      `http://localhost:4000/appointments/${selectedAppointment.id}`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                          status: "CANCELLED",
+                        }),
+                      }
+                    );
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                      alert(data.message || "Cancel failed");
+                      return;
+                    }
+
+                    // Update UI
+                    setAppointments((prev) =>
+                      prev.map((appt) =>
+                        appt.id === selectedAppointment.id
+                          ? { ...appt, status: "Cancelled" }
+                          : appt
+                      )
+                    );
+
+                    setShowCancelPopup(false);
+
+                  } catch (err) {
+                    alert("Something went wrong");
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
