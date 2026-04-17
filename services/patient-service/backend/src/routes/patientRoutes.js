@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
-import { registerPatient, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports } from '../controllers/patient.controler.js';
+import { registerPatient, getMyProfile, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports } from '../controllers/patient.controler.js';
 
 const router = express.Router();
 
@@ -13,6 +13,9 @@ router.post('/reports', authMiddleware, uploadReport);
 
 //view reports for a patient
 router.get('/reports', authMiddleware, getReports);
+
+// Get logged-in patient profile (best: no id mismatch)
+router.get('/me', authMiddleware, getMyProfile);
 
 // Get patient profile
 router.get('/:id', authMiddleware, getProfile);

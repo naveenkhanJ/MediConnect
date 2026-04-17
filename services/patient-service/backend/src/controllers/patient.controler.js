@@ -28,7 +28,29 @@ const registerPatient = async (req, res) => {
 };
 //patient login
 
+// view profile for logged-in patient (no id in URL)
+const getMyProfile = async (req, res) => {
+  try {
+    const patientId = req.patient?.id; // patient-service DB id (resolved from token email)
+    if (!patientId) {
+      return res.status(401).json({ message: 'Unauthorized.' });
+    }
 
+    const result = await pool.query(
+      'SELECT id, name, email, age, gender, contact FROM patients WHERE id=$1',
+      [patientId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('❌ ERROR:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 //view profile of a patient
 
@@ -36,13 +58,17 @@ const getProfile = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (String(req.patient?.id) !== String(id)) {
+    const patientId = req.patient?.id; // patient-service DB id (resolved from token email)
+    const authUserId = req.patient?.authUserId; // auth-service DB id (from token)
+
+    // Frontend may pass auth user id; accept either, but always read by patientId.
+    if (String(patientId) !== String(id) && String(authUserId) !== String(id)) {
       return res.status(403).json({ message: 'Forbidden. You can only view your own profile.' });
     }
 
     const result = await pool.query(
       'SELECT id, name, email, age, gender, contact FROM patients WHERE id=$1',
-      [id]
+      [patientId]
     );
 
     if (result.rows.length === 0) {
@@ -61,13 +87,16 @@ const updateProfile = async (req, res) => {
   const { id } = req.params;
   const { name, email, age, gender, contact } = req.body;
 
-  if (String(req.patient?.id) !== String(id)) {
+  const patientId = req.patient?.id;
+  const authUserId = req.patient?.authUserId;
+
+  if (String(patientId) !== String(id) && String(authUserId) !== String(id)) {
     return res.status(403).json({ message: 'Forbidden. You can only update your own profile.' });
   }
 
   const result = await pool.query(
     `UPDATE patients SET name=$1, email=$2, age=$3, gender=$4, contact=$5 WHERE id=$6 RETURNING *`,
-    [name, email, age, gender, contact, id]
+    [name, email, age, gender, contact, patientId]
   );
 
   res.json(result.rows[0]);
@@ -144,8 +173,11 @@ const getPrescriptions = async (req, res) => {
 const deleteAccount = async (req, res) => {
   const { id } = req.params;
 
+  const patientId = req.patient?.id;
+  const authUserId = req.patient?.authUserId;
+
   // Ensure user can only delete own account
-  if (String(req.patient?.id) !== String(id)) {
+  if (String(patientId) !== String(id) && String(authUserId) !== String(id)) {
     return res.status(403).json({
       message: "Forbidden. You can only delete your own account.",
     });
@@ -157,15 +189,15 @@ const deleteAccount = async (req, res) => {
     await client.query("BEGIN");
 
     // Delete related data (ONLY if these tables exist in THIS service DB)
-    await client.query("DELETE FROM reports WHERE patient_id = $1", [id]);
-    await client.query("DELETE FROM appointments WHERE patient_id = $1", [id]);
+    await client.query("DELETE FROM reports WHERE patient_id = $1", [patientId]);
+    await client.query("DELETE FROM appointments WHERE patient_id = $1", [patientId]);
 
 
 
     // Delete patient
     const deleted = await client.query(
       "DELETE FROM patients WHERE id = $1 RETURNING id, name, email",
-      [id]
+      [patientId]
     );
 
     if (deleted.rows.length === 0) {
@@ -244,4 +276,4 @@ const getPatientContactInternal = async (req, res) => {
   }
 };
 
-export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment,deleteAccount,getReports };
+export { registerPatient, getMyProfile, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment,deleteAccount,getReports };

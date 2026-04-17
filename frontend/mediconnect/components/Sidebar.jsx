@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 
 export default function Sidebar({ activeTab, setActiveTab }) {
+  const [patient, setPatient] = useState(null);
   const menu = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Appointment List", icon: CalendarDays },
@@ -20,6 +22,41 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { name: "Change Password", icon: KeyRound },
     { name: "Logout", icon: LogOut },
   ];
+    useEffect(() => {
+   const fetchPatient = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+
+        if (!user || !user.id) {
+          console.log("No user found");
+          return;
+        }
+
+        const res = await fetch(
+          `http://localhost:4000/patients/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // 🔥 IMPORTANT FIX
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        console.log("PATIENT RESPONSE:", data);
+
+        setPatient(data.data ? data.data : data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+
+    fetchPatient();
+  }, []);
 
   return (
     <div className="w-72 bg-white min-h-screen rounded-lg shadow-sm p-4 ml-30 mr-10 mt-20">
@@ -45,7 +82,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2">
           <h2 className="font-semibold text-gray-800">
-            Emily Rival
+            {patient ? patient.name: "Loading..."}
           </h2>
 
           {/* status badge */}

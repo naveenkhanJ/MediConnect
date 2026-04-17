@@ -34,6 +34,8 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      
+
       // Role-based redirect
       const role = data.user.role;
 
