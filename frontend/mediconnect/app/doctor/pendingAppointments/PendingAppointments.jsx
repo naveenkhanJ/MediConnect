@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 
 const DOCTOR_ID = "d5aeffa5-4623-4d93-9fc3-3b971e72751d";
 

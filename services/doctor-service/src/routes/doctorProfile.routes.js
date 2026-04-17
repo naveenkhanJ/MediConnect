@@ -6,7 +6,7 @@ import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 
-router.post("/",upload.single("image"),createProfileController)
+router.post("/register",upload.single("image"),createProfileController)
 router.get("/me",fakeAuth,requireVerifiedDoctor,getProfileController);
 router.put("/me",fakeAuth,requireVerifiedDoctor,updateProfileController);
 router.get("/search", requireVerifiedDoctor,getDoctorsBySpecialityController);

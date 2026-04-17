@@ -72,11 +72,18 @@ export default function Navbar() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                   <Link
-                    href="/my-appointments"
+                    href="/patient-dashboard"
                     onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f1ff] hover:text-[#5F6FFF]"
                   >
                     My Appointments
+                  </Link>
+                   <Link
+                    href="/patient-dashboard"
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f1ff] hover:text-[#5F6FFF]"
+                  >
+                    Dashboard
                   </Link>
                   <hr className="my-1 border-gray-100" />
                   <button

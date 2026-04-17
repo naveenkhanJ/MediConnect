@@ -59,15 +59,24 @@ app.get('/patients/:id', async (req, res) => {
 });
 
 
-
-
 //  PUT update a patient by ID
 app.put('/patients/:id', async (req, res) => {
   try {
-    const response = await axios.put(`${PATIENT_SERVICE}/api/patients/${req.params.id}`, req.body);
+    const response = await axios.put(
+      `${PATIENT_SERVICE}/api/patients/${req.params.id}`,
+      req.body,
+      {
+        headers: {
+          Authorization: req.headers.authorization, 
+        },
+      }
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
 
@@ -83,15 +92,47 @@ app.delete('/patients/:id', async (req, res) => {
     );
   }
 });
-
+//upload report 
 app.post('/patients/reports', async (req, res) => {
   try {
-    const response = await axios.post(`${PATIENT_SERVICE}/api/patients/reports`, req.body);
+    const response = await axios.post(
+      `${PATIENT_SERVICE}/api/patients/reports`,
+      req.body,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
   }
 });
+//view report
+app.get('/patients/reports', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${PATIENT_SERVICE}/api/patients/reports`,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+        },
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
+  }
+});
+
 
 //view report by the doctor
 app.get('/patients/reports', async (req, res) => {
