@@ -11,6 +11,7 @@ import {
 
 import {
   getDoctorById,
+  getDoctorInternalById,
   searchDoctorsBySpecialty
 } from "../providers/doctor.provider.js";
 
@@ -219,8 +220,63 @@ export const handleDoctorDecisionService = async ({ appointmentId, doctorId, sta
 
   appointment.docStatus = status;
   await updateAppointment(appointment);
+
+  if (status === "ACCEPTED") {
+    triggerPostAcceptanceWorkflow(appointment).catch((err) =>
+      console.warn("Post-acceptance workflow failed:", err.message)
+    );
+  }
+
   return appointment;
 };
+
+async function triggerPostAcceptanceWorkflow(appointment) {
+  const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
+  const telemedicineServiceUrl = process.env.TELEMEDICINE_SERVICE_URL || "http://localhost:5005";
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+  const internalSecret = process.env.INTERNAL_SECRET || "mediconnect-internal";
+
+  let patientEmail, patientPhone, doctorEmail;
+
+  try {
+    const patientRes = await axios.get(
+      `${patientServiceUrl}/api/patients/internal/${appointment.patientId}`,
+      { headers: { "x-internal-secret": internalSecret } }
+    );
+    patientEmail = patientRes.data?.email;
+    patientPhone = patientRes.data?.contact;
+  } catch (err) {
+    console.warn("Could not fetch patient contact info:", err.message);
+  }
+
+  try {
+    const doctor = await getDoctorInternalById(appointment.doctorId);
+    doctorEmail = doctor?.email;
+  } catch (err) {
+    console.warn("Could not fetch doctor email:", err.message);
+  }
+
+  if (appointment.consultationType === "ONLINE") {
+    await axios.post(`${telemedicineServiceUrl}/api/v1/sessions/internal`, {
+      appointmentId: appointment.id,
+      doctorName: appointment.doctorName,
+      patientEmail,
+      patientPhone,
+      doctorEmail,
+    });
+  } else {
+    await axios.post(
+      `${notificationServiceUrl}/api/v1/notifications/appointment-booked`,
+      {
+        appointmentId: appointment.id,
+        patientEmail,
+        patientPhone,
+        doctorEmail,
+        source: "appointment-service",
+      }
+    );
+  }
+}
 
 export const getDoctorTodayAppointmentsService = async (doctorId) => {
   return findTodaysAppointmentsByDoctorId(doctorId);

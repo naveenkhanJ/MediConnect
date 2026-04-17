@@ -24,10 +24,12 @@ export const searchDoctorsController = async (req, res) => {
 
 export const createAppointmentController = async (req, res) => {
   try {
-    const patientId = req.user ? req.user.id : req.body.patientId;
+    // Cast IDs to String to avoid PostgreSQL 'character varying = integer' errors
+    const patientId = String(req.user ? req.user.id : req.body.patientId);
+    const doctorId  = String(req.body.doctorId);
     const result = await createAppointmentService({
       patientId,
-      doctorId: req.body.doctorId,
+      doctorId,
       appointmentDate: req.body.appointmentDate,
       timeSlot: req.body.timeSlot,
       consultationType: req.body.consultationType || "ONLINE"
@@ -83,7 +85,7 @@ export const getAppointmentStatusController = async (req, res) => {
 
 export const getMyAppointmentsController = async (req, res) => {
   try {
-    const appointments = await getMyAppointmentsService(req.user.id);
+    const appointments = await getMyAppointmentsService(String(req.user.id));
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -141,9 +143,13 @@ export const getAppointmentByIdController = async (req, res) => {
 
 export const getDoctorPendingAppointmentsController = async (req, res) => {
   try {
-    const appointments = await getDoctorPendingAppointmentsService(req.params.doctorId);
+    const doctorIdStr = String(req.params.doctorId);
+    console.log("FETCHING CONFIRMED APPOINTMENTS FOR DOCTOR ID:", doctorIdStr);
+    const appointments = await getDoctorPendingAppointmentsService(doctorIdStr);
+    console.log("FOUND APPOINTMENTS:", appointments.length);
     res.status(200).json(appointments);
   } catch (error) {
+    console.error("ERROR IN PENDING APPOINTMENTS:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -151,7 +157,9 @@ export const getDoctorPendingAppointmentsController = async (req, res) => {
 export const handleDoctorDecisionController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { doctorId, status } = req.body;
+    const { status } = req.body;
+    // Cast doctorId to String to fix VARCHAR vs integer comparison
+    const doctorId = String(req.body.doctorId);
 
     if (!doctorId || !status) {
       return res.status(400).json({ message: "doctorId and status are required" });
@@ -169,7 +177,7 @@ export const handleDoctorDecisionController = async (req, res) => {
 
 export const getDoctorTodayAppointmentsController = async (req, res) => {
   try {
-    const appointments = await getDoctorTodayAppointmentsService(req.params.doctorId);
+    const appointments = await getDoctorTodayAppointmentsService(String(req.params.doctorId));
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
