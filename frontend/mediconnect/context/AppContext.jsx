@@ -9,6 +9,7 @@ const AppProvider = ({ children }) => {
   const currencySymbol = "$";
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [ready, setReady] = useState(false);
 
   // On app load, read user and token from localStorage if already logged in
   useEffect(() => {
@@ -16,6 +17,7 @@ const AppProvider = ({ children }) => {
     const storedToken = localStorage.getItem('token');
     if (storedUser) setUser(JSON.parse(storedUser));
     if (storedToken) setToken(storedToken);
+    setReady(true);
   }, []);
 
   const logout = () => {
@@ -33,6 +35,7 @@ const AppProvider = ({ children }) => {
     token,
     setToken,
     logout,
+    ready,
   };
 
   return (

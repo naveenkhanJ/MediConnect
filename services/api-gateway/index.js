@@ -42,7 +42,21 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-//get peteint by id
+// Get logged-in patient's own profile (must be before /patients/:id)
+app.get('/patients/me', async (req, res) => {
+  try {
+    const response = await axios.get(`${PATIENT_SERVICE}/api/patients/me`, {
+      headers: { Authorization: req.headers.authorization }
+    });
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: 'Server Error' }
+    );
+  }
+});
+
+//get patient by id
 app.get('/patients/:id', async (req, res) => {
   console.log("AUTH HEADER FROM CLIENT:", req.headers.authorization);
   try {
@@ -374,6 +388,22 @@ app.put("/api/profile/me", async (req, res) => {
   }
 });
 
+// Get today's appointments (doctor side)
+// Frontend calls: GET /api/doctor/appointments/today
+app.get("/api/doctor/appointments/today", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${DOCTOR_SERVICE_URL}/api/doctor/appointments/today`,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
+  }
+});
+
 // Get pending appointments (doctor side))
 // Frontend calls: GET /api/doctor/appointments/pending
 app.get("/api/doctor/appointments/pending", async (req, res) => {
@@ -401,7 +431,8 @@ app.patch("/api/doctor/appointments/:appointmentId/decision", async (req, res) =
   try {
     const response = await axios.patch(
       `${DOCTOR_SERVICE_URL}/api/doctor/appointments/${req.params.appointmentId}/decision`,
-      req.body
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
     );
 
     res.json(response.data);
@@ -417,9 +448,9 @@ app.patch("/api/doctor/appointments/:appointmentId/decision", async (req, res) =
 app.get("/api/availability", async (req, res) => {
   try {
     const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/availability`
+      `${DOCTOR_SERVICE_URL}/api/availability`,
+      { headers: { Authorization: req.headers.authorization } }
     );
-
     res.json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(
@@ -434,9 +465,9 @@ app.post("/api/availability", async (req, res) => {
   try {
     const response = await axios.post(
       `${DOCTOR_SERVICE_URL}/api/availability`,
-      req.body
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
     );
-
     res.status(201).json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(
@@ -451,9 +482,9 @@ app.put("/api/availability/:id", async (req, res) => {
   try {
     const response = await axios.put(
       `${DOCTOR_SERVICE_URL}/api/availability/${req.params.id}`,
-      req.body
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
     );
-
     res.json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(
@@ -467,9 +498,9 @@ app.put("/api/availability/:id", async (req, res) => {
 app.delete("/api/availability/:id", async (req, res) => {
   try {
     const response = await axios.delete(
-      `${DOCTOR_SERVICE_URL}/api/availability/${req.params.id}`
+      `${DOCTOR_SERVICE_URL}/api/availability/${req.params.id}`,
+      { headers: { Authorization: req.headers.authorization } }
     );
-
     res.json(response.data);
   } catch (err) {
     res.status(err.response?.status || 500).json(
@@ -715,22 +746,38 @@ app.get("/api/telemedicine/appointment/:appointmentId", async (req, res) => {
   }
 });
 
-// Search doctors by speciality
-// Frontend calls: GET /api/doctors/search?speciality=Cardiology
-app.get("/api/doctors/search", async (req, res) => {
-  try {
-    const response = await axios.get(
-      `${DOCTOR_SERVICE_URL}/api/profile/search`,
-      {
-        params: req.query
-      }
-    );
+// (Removed /api/doctors/search route because /api/doctors handles query parameters)
 
+// Get all doctors (Public)
+// Frontend calls: GET /api/doctors
+app.get("/api/doctors", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors`, { params: req.query });
     res.json(response.data);
   } catch (err) {
-    res.status(err.response?.status || 500).json(
-      err.response?.data || { message: "Server Error" }
-    );
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get single doctor by ID
+// Frontend calls: GET /api/doctors/:id
+app.get("/api/doctors/:id", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors/${req.params.id}`);
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get doctor availability by ID (Public)
+// Frontend calls: GET /api/doctors/:id/availability
+app.get("/api/doctors/:id/availability", async (req, res) => {
+  try {
+    const response = await axios.get(`${DOCTOR_SERVICE_URL}/api/doctors/${req.params.id}/availability`);
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
   }
 });
 
@@ -761,6 +808,64 @@ app.post("/api/symptoms/check", async (req, res) => {
   }
 });
 
+
+// ─── ADMIN ROUTES (proxied to auth-service) ───────────────────────────────────
+
+// Get all doctors (admin)
+// Frontend calls: GET /api/admin/doctors
+app.get("/api/admin/doctors", async (req, res) => {
+  try {
+    const response = await axios.get(`${AUTH_SERVICE}/api/admin/doctors`, {
+      headers: { Authorization: req.headers.authorization },
+    });
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Verify a doctor (admin)
+// Frontend calls: PATCH /api/admin/doctors/:id/verify
+app.patch("/api/admin/doctors/:id/verify", async (req, res) => {
+  try {
+    const response = await axios.patch(
+      `${AUTH_SERVICE}/api/admin/doctors/${req.params.id}/verify`,
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Reject a doctor (admin)
+// Frontend calls: PATCH /api/admin/doctors/:id/reject
+app.patch("/api/admin/doctors/:id/reject", async (req, res) => {
+  try {
+    const response = await axios.patch(
+      `${AUTH_SERVICE}/api/admin/doctors/${req.params.id}/reject`,
+      req.body,
+      { headers: { Authorization: req.headers.authorization } }
+    );
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
+
+// Get all patients (admin)
+// Frontend calls: GET /api/admin/patients
+app.get("/api/admin/patients", async (req, res) => {
+  try {
+    const response = await axios.get(`${AUTH_SERVICE}/api/admin/patients`, {
+      headers: { Authorization: req.headers.authorization },
+    });
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Server Error" });
+  }
+});
 
 // ─── START SERVER ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 4000;

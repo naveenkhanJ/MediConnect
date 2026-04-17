@@ -123,40 +123,62 @@ const handleBookAppointment = async () => {
       <div className="bg-white rounded-lg shadow mt-6 p-6">
         <p className="text-base font-bold text-gray-800 mb-4">Booking Slot</p>
 
-        {/* Date Pills */}
-        <div className="flex gap-3 overflow-x-scroll items-center pb-2">
-          {docSlot.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedDate(index)}
-              className={`min-w-[60px] text-center cursor-pointer py-4 px-3 rounded-full text-sm font-medium transition-colors ${
-                selectedDate === index
-                  ? "bg-[#5F6FFF] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              <p>{daysOfWeek[item.slots[0]?.datetime.getDay()]}</p>
-              <p className="text-xs mt-1">{item.slots[0]?.datetime.getDate()}</p>
+        {docSlot.length === 0 ? (
+          <div className="text-center py-10 text-gray-400">
+            <div className="text-4xl mb-3">📅</div>
+            <p className="font-medium text-gray-500">No availability scheduled</p>
+            <p className="text-sm mt-1">This doctor has not set up their availability yet. Please check back later.</p>
+          </div>
+        ) : (
+          <>
+            {/* Date Pills */}
+            <div className="flex gap-3 overflow-x-scroll items-center pb-2">
+              {docSlot.map((item, index) => {
+                const isToday = item.dateStr === new Date().toISOString().split("T")[0];
+                return (
+                  <div
+                    key={index}
+                    onClick={() => setSelectedDate(index)}
+                    className={`min-w-[70px] text-center cursor-pointer py-4 px-3 rounded-full text-sm font-medium transition-colors flex-shrink-0 ${
+                      selectedDate === index
+                        ? "bg-[#5F6FFF] text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    <p className="font-bold text-xs uppercase">
+                      {isToday ? "Today" : daysOfWeek[item.date.getDay()]}
+                    </p>
+                    <p className="text-base mt-1">{item.date.getDate()}</p>
+                    <p className="text-[10px] opacity-70">{item.date.toLocaleString("default", { month: "short" })}</p>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
 
-        {/* Time Slot Pills */}
-        <div className="flex items-center py-2 max-w-[800px] gap-3 mt-4 overflow-x-scroll">
-          {docSlot[selectedDate]?.slots.map((slot, i) => (
-            <p
-              key={i}
-              onClick={() => setSlotTime(slot.time)}
-              className={`px-5 py-2 cursor-pointer text-sm font-medium flex-shrink-0 rounded-full transition-colors ${
-                slotTime === slot.time
-                  ? "bg-[#5F6FFF] text-white"
-                  : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
-              }`}
-            >
-              {slot.time}
-            </p>
-          ))}
-        </div>
+            {/* Time Slot Pills */}
+            {docSlot[selectedDate]?.slots.length === 0 ? (
+              <div className="mt-4 py-6 text-center text-gray-400 text-sm bg-gray-50 rounded-lg">
+                No more available slots for this day.
+              </div>
+            ) : (
+              <div className="flex items-center py-2 max-w-[800px] gap-3 mt-4 overflow-x-scroll">
+                {docSlot[selectedDate]?.slots.map((slot, i) => (
+                  <p
+                    key={i}
+                    onClick={() => setSlotTime(slot.time)}
+                    className={`px-5 py-2 cursor-pointer text-sm font-medium flex-shrink-0 rounded-full transition-colors ${
+                      slotTime === slot.time
+                        ? "bg-[#5F6FFF] text-white"
+                        : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                    }`}
+                  >
+                    {slot.time}
+                  </p>
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
         {/* Consultation Type Selector */}
         <div className="mt-6">

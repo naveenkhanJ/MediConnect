@@ -26,7 +26,7 @@ function StatusBadge({ status }) {
 }
 
 export default function MyAppointmentsPage() {
-  const { user } = useContext(AppContext);
+  const { user, ready } = useContext(AppContext);
   const router = useRouter();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,12 +57,13 @@ export default function MyAppointmentsPage() {
   }, [user]);
 
   useEffect(() => {
+    if (!ready) return;
     if (!user) {
       router.push("/Auth/login");
       return;
     }
     fetchAppointments();
-  }, [user, fetchAppointments, router]);
+  }, [ready, user, fetchAppointments, router]);
 
   // Poll live status for any PENDING_PAYMENT or CONFIRMED appointments
   useEffect(() => {

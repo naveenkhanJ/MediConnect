@@ -3,6 +3,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/AppContext";
+import { apiFetch } from "@/lib/api";
 
 const API = "http://localhost:4000";
 
@@ -24,7 +25,7 @@ export default function DoctorTelemedicine() {
   const [loadingAppts, setLoadingAppts] = useState(true);
   const [actionId, setActionId] = useState(null); // appointmentId being acted on
 
-  const doctorId = user?.id || "doc124";
+  const doctorId = user?.id;
 
   useEffect(() => {
     fetchAppointments();
@@ -33,16 +34,11 @@ export default function DoctorTelemedicine() {
   const fetchAppointments = async () => {
     setLoadingAppts(true);
     try {
-      const res = await fetch(
-        `${API}/api/appointments/doctor/${doctorId}/pending`,
-        { headers: { Authorization: `Bearer mock-token` } }
-      );
-      const data = await res.json();
+      const data = await apiFetch("/api/doctor/appointments/pending", { auth: true });
       const online = (Array.isArray(data) ? data : data.appointments || []).filter(
         (a) => a.consultationType === "ONLINE"
       );
       setAppointments(online);
-      // Fetch existing sessions for each appointment in parallel
       await fetchSessionsForAppointments(online);
     } catch {
       // non-critical
@@ -59,7 +55,7 @@ export default function DoctorTelemedicine() {
             `${API}/api/telemedicine/appointment/${a.id}`,
             {
               headers: {
-                "x-user-id": doctorId,
+                ...(doctorId ? { "x-user-id": doctorId } : {}),
                 "x-user-role": "DOCTOR",
               },
             }
@@ -86,7 +82,7 @@ export default function DoctorTelemedicine() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": doctorId,
+          ...(doctorId ? { "x-user-id": doctorId } : {}),
           "x-user-role": "DOCTOR",
         },
         body: JSON.stringify({ appointmentId: appt.id }),
@@ -116,7 +112,7 @@ export default function DoctorTelemedicine() {
       const res = await fetch(`${API}/api/telemedicine/${session.id}/end`, {
         method: "PATCH",
         headers: {
-          "x-user-id": doctorId,
+          ...(doctorId ? { "x-user-id": doctorId } : {}),
           "x-user-role": "DOCTOR",
         },
       });
