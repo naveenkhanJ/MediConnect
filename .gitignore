@@ -35,3 +35,65 @@ coverage/
 
 # Misc
 *.local
+<<<<<<< HEAD
+=======
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build files
+dist/
+build/
+
+# Docker
+*.pid
+
+# IDE
+.vscode/
+.idea/
+
+# Dependency locks (optional)
+# package-lock.json
+
+# Coverage
+coverage/
+
+# Misc
+*.local
+>>>>>>> origin/devolopment
+
+# Frontend Next.js specific
+frontend/mediconnect/.next/
+frontend/mediconnect/out/
+frontend/mediconnect/.pnp
+frontend/mediconnect/.pnp.*
+frontend/mediconnect/.yarn/*
+!frontend/mediconnect/.yarn/patches
+!frontend/mediconnect/.yarn/plugins
+!frontend/mediconnect/.yarn/releases
+!frontend/mediconnect/.yarn/versions
+frontend/mediconnect/coverage
+frontend/mediconnect/.DS_Store
+frontend/mediconnect/*.pem
+frontend/mediconnect/npm-debug.log*
+frontend/mediconnect/yarn-debug.log*
+frontend/mediconnect/yarn-error.log*
+frontend/mediconnect/.pnpm-debug.log*
+frontend/mediconnect/.env*
+frontend/mediconnect/.vercel
+frontend/mediconnect/*.tsbuildinfo
+frontend/mediconnect/next-env.d.ts

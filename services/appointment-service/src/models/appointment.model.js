@@ -38,10 +38,6 @@ const Appointment = sequelize.define(
       allowNull: false,
       defaultValue: "ONLINE"
     },
-    meetingLink: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
     paymentId: {
       type: DataTypes.STRING,
       allowNull: true
@@ -57,6 +53,11 @@ const Appointment = sequelize.define(
       ),
       allowNull: false,
       defaultValue: "PENDING_PAYMENT"
+    },
+    docStatus: {
+      type: DataTypes.ENUM("PENDING", "ACCEPTED", "REJECTED"),
+      allowNull: false,
+      defaultValue: "PENDING"
     }
   },
   {

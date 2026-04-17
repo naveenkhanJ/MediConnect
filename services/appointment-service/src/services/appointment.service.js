@@ -4,13 +4,16 @@ import {
   findAppointmentByDoctorDateSlot,
   findAppointmentById,
   updateAppointment,
-  findAppointmentsByPatientId
+  findAppointmentsByPatientId,
+  findConfirmedAppointmentsByDoctorId,
+  findTodaysAppointmentsByDoctorId
 } from "../repositories/appointment.repository.js";
+
 import {
   getDoctorById,
+  getDoctorInternalById,
   searchDoctorsBySpecialty
 } from "../providers/doctor.provider.js";
-import { generateJitsiMeetingLink } from "../utils/jitsi.util.js";
 
 export const searchDoctorsService = async (specialty) => {
   if (!specialty) {
@@ -31,10 +34,6 @@ export const createAppointmentService = async ({
 
   if (!doctor) {
     throw new Error("Doctor not found");
-  }
-
-  if (!doctor.availableSlots.includes(timeSlot)) {
-    throw new Error("Selected time slot is not available");
   }
 
   const existing = await findAppointmentByDoctorDateSlot(
@@ -59,7 +58,7 @@ export const createAppointmentService = async ({
   });
 
   const paymentResponse = await axios.post(
-    `${process.env.PAYMENT_SERVICE_URL}/api/payments/create`,
+    `${process.env.PAYMENT_SERVICE_URL || "http://localhost:5003"}/api/payments/create`,
     {
       appointmentId: appointment.id,
       patientId,
@@ -156,10 +155,129 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
   appointment.status = "CONFIRMED";
   appointment.paymentId = paymentId;
 
-  if (appointment.consultationType === "ONLINE") {
-    appointment.meetingLink = generateJitsiMeetingLink(appointment.id);
+  await updateAppointment(appointment);
+
+  // Notify patient and doctor after confirmation — fire-and-forget
+  try {
+    const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
+    const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+
+    // Fetch patient contact details from patient service (internal endpoint, no auth)
+    const patientRes = await axios.get(
+      `${patientServiceUrl}/api/patients/internal/${appointment.patientId}`
+    );
+    const patient = patientRes.data;
+
+    await axios.post(`${notificationServiceUrl}/api/v1/notifications/appointment-booked`, {
+      appointmentId: appointment.id,
+      patientEmail: patient.email || undefined,
+      patientPhone: patient.contact || undefined,
+      doctorEmail: undefined,   // doctor email not yet in doctor model; extend later if needed
+      source: "appointment-service",
+    });
+  } catch (notifyErr) {
+    // Notification failure must never break the confirmation flow
+    console.warn("Notification dispatch failed:", notifyErr.message);
   }
 
-  await updateAppointment(appointment);
   return appointment;
+};
+
+export const getAppointmentByIdService = async (appointmentId) => {
+  const appointment = await findAppointmentById(appointmentId);
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+  return appointment;
+};
+
+export const getDoctorPendingAppointmentsService = async (doctorId) => {
+  return findConfirmedAppointmentsByDoctorId(doctorId);
+};
+
+export const handleDoctorDecisionService = async ({ appointmentId, doctorId, status }) => {
+  const appointment = await findAppointmentById(appointmentId);
+
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+
+  if (appointment.doctorId !== doctorId) {
+    throw new Error("You are not authorized to modify this appointment");
+  }
+
+  if (appointment.status !== "CONFIRMED") {
+    throw new Error("Only confirmed appointments can be accepted or rejected");
+  }
+
+  if (appointment.docStatus !== "PENDING") {
+    throw new Error("Doctor has already made a decision on this appointment");
+  }
+
+  if (!["ACCEPTED", "REJECTED"].includes(status)) {
+    throw new Error("Invalid decision. Use ACCEPTED or REJECTED");
+  }
+
+  appointment.docStatus = status;
+  await updateAppointment(appointment);
+
+  if (status === "ACCEPTED") {
+    triggerPostAcceptanceWorkflow(appointment).catch((err) =>
+      console.warn("Post-acceptance workflow failed:", err.message)
+    );
+  }
+
+  return appointment;
+};
+
+async function triggerPostAcceptanceWorkflow(appointment) {
+  const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
+  const telemedicineServiceUrl = process.env.TELEMEDICINE_SERVICE_URL || "http://localhost:5005";
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+  const internalSecret = process.env.INTERNAL_SECRET || "mediconnect-internal";
+
+  let patientEmail, patientPhone, doctorEmail;
+
+  try {
+    const patientRes = await axios.get(
+      `${patientServiceUrl}/api/patients/internal/${appointment.patientId}`,
+      { headers: { "x-internal-secret": internalSecret } }
+    );
+    patientEmail = patientRes.data?.email;
+    patientPhone = patientRes.data?.contact;
+  } catch (err) {
+    console.warn("Could not fetch patient contact info:", err.message);
+  }
+
+  try {
+    const doctor = await getDoctorInternalById(appointment.doctorId);
+    doctorEmail = doctor?.email;
+  } catch (err) {
+    console.warn("Could not fetch doctor email:", err.message);
+  }
+
+  if (appointment.consultationType === "ONLINE") {
+    await axios.post(`${telemedicineServiceUrl}/api/v1/sessions/internal`, {
+      appointmentId: appointment.id,
+      doctorName: appointment.doctorName,
+      patientEmail,
+      patientPhone,
+      doctorEmail,
+    });
+  } else {
+    await axios.post(
+      `${notificationServiceUrl}/api/v1/notifications/appointment-booked`,
+      {
+        appointmentId: appointment.id,
+        patientEmail,
+        patientPhone,
+        doctorEmail,
+        source: "appointment-service",
+      }
+    );
+  }
+}
+
+export const getDoctorTodayAppointmentsService = async (doctorId) => {
+  return findTodaysAppointmentsByDoctorId(doctorId);
 };
