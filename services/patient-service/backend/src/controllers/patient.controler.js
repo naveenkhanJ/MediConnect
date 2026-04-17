@@ -139,43 +139,60 @@ const getPrescriptions = async (req, res) => {
   res.json(result.rows);
 };
 
-//delete patient account (and related data)
+
+// delete patient account
 const deleteAccount = async (req, res) => {
   const { id } = req.params;
 
+  // Ensure user can only delete own account
   if (String(req.patient?.id) !== String(id)) {
-    return res.status(403).json({ message: 'Forbidden. You can only delete your own account.' });
+    return res.status(403).json({
+      message: "Forbidden. You can only delete your own account.",
+    });
   }
 
   const client = await pool.connect();
+
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
-    // Avoid FK constraint errors if cascades aren't set.
-    await client.query('DELETE FROM reports WHERE patient_id=$1', [id]);
-    await client.query('DELETE FROM appointments WHERE patient_id=$1', [id]);
-    await client.query('DELETE FROM prescriptions WHERE patient_id=$1', [id]);
+    // Delete related data (ONLY if these tables exist in THIS service DB)
+    await client.query("DELETE FROM reports WHERE patient_id = $1", [id]);
+    await client.query("DELETE FROM appointments WHERE patient_id = $1", [id]);
 
+
+
+    // Delete patient
     const deleted = await client.query(
-      'DELETE FROM patients WHERE id=$1 RETURNING id, name, email',
+      "DELETE FROM patients WHERE id = $1 RETURNING id, name, email",
       [id]
     );
 
-    await client.query('COMMIT');
-
     if (deleted.rows.length === 0) {
-      return res.status(404).json({ message: 'Patient not found' });
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Patient not found" });
     }
 
-    res.json({ message: 'Account deleted successfully', patient: deleted.rows[0] });
+    await client.query("COMMIT");
+
+    res.json({
+      message: "Account deleted successfully",
+      patient: deleted.rows[0],
+    });
   } catch (err) {
-    await client.query('ROLLBACK');
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
+    await client.query("ROLLBACK");
+    console.error("Delete Account Error:", err.message);
+
+    res.status(500).json({
+      message: "Server Error",
+      error: err.message,
+    });
   } finally {
     client.release();
   }
 };
+
+export default deleteAccount;
 
 //create doctor appointment
 const createDoctorAppointment = async (req, res) => {
