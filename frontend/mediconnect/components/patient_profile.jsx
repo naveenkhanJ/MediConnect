@@ -1,22 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
-import {
-  getMyPatientProfile,
-  updateMyPatientProfile,
-  deleteMyPatientAccount,
-} from "../lib/patientProfileApi";
+import { deleteMyPatientAccount, getMyPatientProfile, updateMyPatientProfile } from "../lib/patientProfileApi";
 
 export default function ProfileUpdatePage() {
   const router = useRouter();
 
+  // Initialize state with existing user data
   const [userData, setUserData] = useState({
     title: "Mr.",
-    displayName: "",
     email: "",
-    mobile: "",
+    mobile: "+1 234 567 8900",
+    displayName: "John Doe",
     gender: "Male",
-    age: "",
+    age: "35"
   });
 
   const [patientId, setPatientId] = useState(null);
@@ -27,7 +24,7 @@ export default function ProfileUpdatePage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) {
       setError("Please login to view your profile.");
       setLoading(false);
@@ -38,15 +35,19 @@ export default function ProfileUpdatePage() {
       try {
         setLoading(true);
         setError("");
+        setSuccess("");
+
         const data = await getMyPatientProfile(token);
+
         setPatientId(data?.id ?? null);
+
         setUserData((prev) => ({
           ...prev,
-          displayName: data?.name ?? "",
-          email: data?.email ?? "",
-          mobile: data?.contact ?? "",
-          gender: data?.gender ?? "Male",
-          age: data?.age != null ? String(data.age) : "",
+          displayName: data?.name ?? prev.displayName,
+          email: data?.email ?? prev.email,
+          mobile: data?.contact ?? prev.mobile,
+          gender: data?.gender ?? prev.gender,
+          age: data?.age != null ? String(data.age) : prev.age,
         }));
       } catch (e) {
         setError("Something went wrong while loading profile.");
@@ -60,45 +61,31 @@ export default function ProfileUpdatePage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) { setError("Please login again."); return; }
-    if (!patientId) { setError("Patient profile not loaded yet."); return; }
-
-    try {
-      setLoading(true);
-      setError("");
-      setSuccess("");
-      await updateMyPatientProfile(token, patientId, {
-        name: userData.displayName.trim(),
-        email: userData.email,
-        age: userData.age ? Number(userData.age) : null,
-        gender: userData.gender,
-        contact: userData.mobile,
-      });
-      setSuccess("Profile updated successfully.");
-    } catch (e) {
-      setError(e?.message || "Something went wrong while updating profile.");
-    } finally {
-      setLoading(false);
-    }
+    setUserData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleDeleteAccount = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) { setError("Please login again."); setShowDeleteModal(false); return; }
-    if (!patientId) { setError("Patient profile not loaded yet."); setShowDeleteModal(false); return; }
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) {
+      setError("Please login again.");
+      setShowDeleteModal(false);
+      return;
+    }
+    if (!patientId) {
+      setError("Patient profile not loaded yet.");
+      setShowDeleteModal(false);
+      return;
+    }
 
     try {
       setDeleting(true);
       setError("");
+      setSuccess("");
+
       await deleteMyPatientAccount(token, patientId);
+
+      // cleanup session + redirect to home
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
       setShowDeleteModal(false);
       router.replace("/");
     } catch (e) {
@@ -108,12 +95,48 @@ export default function ProfileUpdatePage() {
     }
   };
 
-  return (
-    <div className="min-h-screen p-4 font-sans text-slate-700 mt-16 border border-gray-200">
-      <div className="max-w-4xl bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) {
+      setError("Please login again.");
+      return;
+    }
+    if (!patientId) {
+      setError("Patient profile not loaded yet.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const name = userData.displayName?.trim() || "";
+
+      await updateMyPatientProfile(token, patientId, {
+        name,
+        email: userData.email,
+        age: userData.age ? Number(userData.age) : null,
+        gender: userData.gender,
+        contact: userData.mobile,
+      });
+
+      setSuccess("Profile updated successfully.");
+    } catch (e) {
+      setError(e?.message || "Something went wrong while updating profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen  p-4  font-sans text-slate-700 mt-16 border border-gray-200">
+      <div className="max-w-4xl bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        
         {/* Tab Navigation */}
-        <div className="flex bg-gray-100/50 p-2 border-b border-gray-200">
+        <div className="flex bg-gray-100/50 p-2 border-b border-gray-200 p ">
           <button className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-t-lg font-medium text-sm">Profile</button>
           <button className="flex-1 py-3 px-4 text-gray-500 hover:bg-gray-200 transition text-sm">Change Password</button>
           <button className="flex-1 py-3 px-4 text-gray-500 hover:bg-gray-200 transition text-sm">Email Notification</button>
@@ -130,19 +153,26 @@ export default function ProfileUpdatePage() {
           <h1 className="text-2xl font-bold text-slate-800 mb-4">Profile Settings</h1>
           <div className="border-b border-gray-100 mb-8"></div>
 
-          {loading && <div className="mb-6 text-sm text-slate-500">Loading profile...</div>}
-          {!loading && error && <div className="mb-6 text-sm text-red-600">{error}</div>}
-          {!loading && !error && success && <div className="mb-6 text-sm text-green-700">{success}</div>}
-
+          {loading && (
+            <div className="mb-6 text-sm text-slate-500">Loading profile...</div>
+          )}
+          {!loading && error && (
+            <div className="mb-6 text-sm text-red-600">{error}</div>
+          )}
+          {!loading && !error && success && (
+            <div className="mb-6 text-sm text-green-700">{success}</div>
+          )}
+          
           <form onSubmit={handleSubmit}>
             <h2 className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-6">Information</h2>
 
+            {/* Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-              {/* Title */}
+              
+              {/* Title Dropdown */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-slate-600">Title</label>
-                <select
+                <select 
                   name="title"
                   value={userData.title}
                   onChange={handleChange}
@@ -157,7 +187,7 @@ export default function ProfileUpdatePage() {
               {/* Display Name */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-slate-600">Display Name</label>
-                <input
+                <input 
                   type="text"
                   name="displayName"
                   value={userData.displayName}
@@ -169,7 +199,7 @@ export default function ProfileUpdatePage() {
               {/* Email */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-slate-600">Email</label>
-                <input
+                <input 
                   type="email"
                   name="email"
                   value={userData.email}
@@ -181,7 +211,7 @@ export default function ProfileUpdatePage() {
               {/* Mobile Number */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-slate-600">Mobile Number</label>
-                <input
+                <input 
                   type="text"
                   name="mobile"
                   value={userData.mobile}
@@ -190,11 +220,11 @@ export default function ProfileUpdatePage() {
                 />
               </div>
 
-              {/* Gender & Age */}
+              {/* Gender & Age Row */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-semibold text-slate-600">Gender</label>
-                  <select
+                  <select 
                     name="gender"
                     value={userData.gender}
                     onChange={handleChange}
@@ -206,7 +236,7 @@ export default function ProfileUpdatePage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-semibold text-slate-600">Age</label>
-                  <input
+                  <input 
                     type="number"
                     name="age"
                     value={userData.age}
@@ -218,11 +248,12 @@ export default function ProfileUpdatePage() {
 
             </div>
 
+            {/* Save Button */}
             <div className="mt-12 flex justify-end">
-              <button
+              <button 
                 type="submit"
                 disabled={loading || deleting}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md shadow-blue-200 transition-all active:scale-95 disabled:opacity-60"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md shadow-blue-200 transition-all active:scale-95"
               >
                 Save Changes
               </button>
@@ -231,7 +262,6 @@ export default function ProfileUpdatePage() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-xl bg-white shadow-xl border border-gray-100">
@@ -240,6 +270,7 @@ export default function ProfileUpdatePage() {
               <p className="mt-2 text-sm text-slate-600">
                 This action is permanent. Your profile and related data will be removed.
               </p>
+
               <div className="mt-6 flex items-center justify-end gap-3">
                 <button
                   type="button"

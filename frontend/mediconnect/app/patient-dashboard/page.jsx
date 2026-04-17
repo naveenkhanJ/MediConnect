@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
-import MyAppointmentsPage from "@/app/my-appointments/page";
+import AppointmentList from "@/components/AppointmentList";
 import PatientProfile from "@/components/patient_profile";
 import Dashboard from "@/components/Patient_dashbord";
 
@@ -19,7 +19,7 @@ export default function PatientDashboard() {
       <div className="flex-1 bg-gray-100">
         {activeTab === "Dashboard" && <Dashboard />}
 
-        {activeTab === "Appointment List" && <MyAppointmentsPage />}
+        {activeTab === "Appointment List" && <AppointmentList />}
 
         {activeTab === "Messages" && (
           <div className="p-6">Messages Page</div>
