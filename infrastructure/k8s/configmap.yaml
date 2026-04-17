@@ -8,17 +8,36 @@ data:
   DB_USER: "postgres"
   DB_PORT: "5432"
 
-  # Appointment DB
+  # DB Hosts
+  AUTH_DB_HOST: "auth-db"
+  PATIENT_DB_HOST: "patient-db"
+  DOCTOR_DB_HOST: "doctor-db"
   APPOINTMENT_DB_HOST: "appointment-db"
-  APPOINTMENT_DB_NAME: "appointment_db"
-
-  # Payment DB
   PAYMENT_DB_HOST: "payment-db"
+  NOTIFICATION_DB_HOST: "notification-db"
+  TELEMEDICINE_DB_HOST: "telemedicine-db"
+
+  # DB Names
+  AUTH_DB_NAME: "auth_db"
+  PATIENT_DB_NAME: "patient_db"
+  DOCTOR_DB_NAME: "doctor_db"
+  APPOINTMENT_DB_NAME: "appointment_db"
   PAYMENT_DB_NAME: "payment_db"
+  NOTIFICATION_DB_NAME: "notification_db"
+  TELEMEDICINE_DB_NAME: "telemedicine_db"
 
   # Inter-service URLs (use k8s Service names)
+  AUTH_SERVICE_URL: "http://auth-service:5000"
+  PATIENT_SERVICE_URL: "http://patient-service:5002"
+  DOCTOR_SERVICE_URL: "http://doctor-service:5009"
   APPOINTMENT_SERVICE_URL: "http://appointment-service:5003"
   PAYMENT_SERVICE_URL: "http://payment-service:5004"
+  TELEMEDICINE_SERVICE_URL: "http://telemedicine-service:5005"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:5006"
+
+  # Gateway & Frontend
+  GATEWAY_PORT: "4000"
+  FRONTEND_API_URL: "http://api-gateway:4000"
 
   # PayHere URLs
   PAYHERE_RETURN_URL: "http://localhost:3000/payment/success"

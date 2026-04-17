@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-db
+  namespace: mediconnect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-db
+  template:
+    metadata:
+      labels:
+        app: auth-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: AUTH_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mediconnect-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: auth-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: auth-db-storage
+          persistentVolumeClaim:
+            claimName: auth-db-pvc

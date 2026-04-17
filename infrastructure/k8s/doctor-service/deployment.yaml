@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-service
+  namespace: mediconnect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doctor-service
+  template:
+    metadata:
+      labels:
+        app: doctor-service
+    spec:
+      containers:
+        - name: doctor-service
+          image: mediconnect-doctor-service:latest
+          ports:
+            - containerPort: 5009
+          env:
+            - name: PORT
+              value: "5009"
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: NODE_ENV
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DOCTOR_DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DOCTOR_DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mediconnect-secrets
+                  key: DB_PASSWORD
+            - name: INTERNAL_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mediconnect-secrets
+                  key: INTERNAL_SECRET
+            - name: APPOINTMENT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: APPOINTMENT_SERVICE_URL
