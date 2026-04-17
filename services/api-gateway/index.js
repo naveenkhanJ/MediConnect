@@ -2,6 +2,8 @@ import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import multer from "multer";
+import FormData from "form-data";
 dotenv.config();
 
 // Service URLs — use env vars in Docker, fall back to localhost for local dev
@@ -15,6 +17,8 @@ app.use(cors());
 app.use(express.json());
 // PayHere sends notify as application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 //login
 
@@ -93,18 +97,27 @@ app.delete('/patients/:id', async (req, res) => {
   }
 });
 //upload report 
-app.post('/patients/reports', async (req, res) => {
+app.post('/patients/reports', upload.single("file"), async (req, res) => {
   try {
-    const response = await axios.post(
-      `${PATIENT_SERVICE}/api/patients/reports`,
-      req.body,
-      {
-        headers: {
-          Authorization: req.headers.authorization,
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    const form = new FormData();
+    if (req.body?.report_name != null) form.append("report_name", String(req.body.report_name));
+    if (req.body?.description != null) form.append("description", String(req.body.description));
+    if (req.body?.file_url != null) form.append("file_url", String(req.body.file_url));
+    if (req.file) {
+      form.append("file", req.file.buffer, {
+        filename: req.file.originalname || "report",
+        contentType: req.file.mimetype || "application/octet-stream",
+      });
+    }
+
+    const response = await axios.post(`${PATIENT_SERVICE}/api/patients/reports`, form, {
+      headers: {
+        Authorization: req.headers.authorization,
+        ...form.getHeaders(),
+      },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+    });
 
     res.json(response.data);
   } catch (err) {

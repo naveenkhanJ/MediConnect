@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import patientRoutes from './routes/patientRoutes.js';
 import   dbConfig from '../src/config/db.js'
+import path from "path";
 
 dotenv.config();
 
@@ -11,6 +12,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve uploaded report files
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use('/api/patients', patientRoutes);
 

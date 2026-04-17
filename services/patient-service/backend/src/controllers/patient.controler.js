@@ -105,13 +105,31 @@ const updateProfile = async (req, res) => {
 //upload report for a patient
 const uploadReport = async (req, res) => {
   try {
-    const { report_name, file_url, description } = req.body;
-    const patient_id = req.patient.id;
+    const { report_name, description } = req.body;
+    const patient_id = req.patient?.id;
+
+    if (!patient_id) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const name = (report_name || "").trim();
+    if (!name) {
+      return res.status(400).json({ message: "report_name is required" });
+    }
+
+    const fileUrlFromUpload = req.file
+      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      : "";
+
+    const file_url = fileUrlFromUpload || (req.body?.file_url || "").trim();
+    if (!file_url) {
+      return res.status(400).json({ message: "file is required" });
+    }
 
     const result = await pool.query(
       `INSERT INTO reports (patient_id, report_name, file_url, description)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [patient_id, report_name, file_url, description]
+      [patient_id, name, file_url, description || ""]
     );
 
     res.json(result.rows[0]);
@@ -127,7 +145,7 @@ const getReports = async (req, res) => {
     const patient_id = req.patient.id;
 
     const result = await pool.query(
-      `SELECT id, patient_id, report_name, file_url, description
+      `SELECT id, patient_id, report_name, file_url, description, created_at
        FROM reports
        WHERE patient_id=$1
        ORDER BY id DESC`,

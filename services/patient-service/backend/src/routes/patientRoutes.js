@@ -1,5 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
+import upload from "../middlewares/upload.js";
 
 import { registerPatient, getMyProfile, getProfile, updateProfile, uploadReport, createDoctorAppointment,deleteAccount,getReports } from '../controllers/patient.controler.js';
 
@@ -9,7 +10,7 @@ const router = express.Router();
 router.post('/register', registerPatient);
 
 // Upload report for a patient
-router.post('/reports', authMiddleware, uploadReport);
+router.post('/reports', authMiddleware, upload.single("file"), uploadReport);
 
 //view reports for a patient
 router.get('/reports', authMiddleware, getReports);
