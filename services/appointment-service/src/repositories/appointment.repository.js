@@ -41,7 +41,7 @@ export const findAppointmentsByPatientId = async (patientId) => {
 
 export const findConfirmedAppointmentsByDoctorId = async (doctorId) => {
   return Appointment.findAll({
-    where: { doctorId, status: "CONFIRMED" },
+    where: { doctorId, status: "CONFIRMED", docStatus: "PENDING" },
     order: [["appointmentDate", "ASC"], ["timeSlot", "ASC"]]
   });
 };
@@ -52,7 +52,7 @@ export const findTodaysAppointmentsByDoctorId = async (doctorId) => {
     where: {
       doctorId,
       appointmentDate: today,
-      status: { [Op.in]: ["CONFIRMED", "RESCHEDULED"] }
+      status: "CONFIRMED"
     },
     order: [["timeSlot", "ASC"]]
   });

@@ -21,7 +21,7 @@ export const createPrescriptionController = async (req, res) => {
        
         if (!appointment) {
             return res.status(404).json({ message: "Appointment not found" });
-        }
+        }//
 
         // ensure doctor owns appointment
         if (appointment.doctorId !== doctorId) {
