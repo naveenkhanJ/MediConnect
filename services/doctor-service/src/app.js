@@ -8,17 +8,23 @@ import profileRoutes from "./routes/doctorProfile.routes.js";
 import telemedicineRoutes from "./routes/telemedicine.routes.js";
 import getDashboardSummaryRoutes from "./routes/dashboard.route.js";
 import publicDoctorRoutes from "./routes/publicDoctor.routes.js";
-import { fakeAuth } from "./middlewares/fakeAuth.js";
+import internalDoctorRoutes from "./routes/internalDoctor.routes.js";
+import { authMiddleware } from "./middlewares/authMiddleware.js";
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 // Public doctor catalog routes (no auth)
 app.use("/api/doctors", publicDoctorRoutes);
 
-//fake auth
-app.use(fakeAuth);
+// Internal service-to-service routes (no JWT — uses shared secret)
+app.use("/internal/doctors", internalDoctorRoutes);
 
-app.use(cors());
-app.use(express.json());
+// Manage profile (Internal auth handling within router)
+app.use("/api/profile", profileRoutes);
+
+app.use(authMiddleware);
 
 //availavility
 app.use("/api/availability", availabilityRoute);
@@ -28,8 +34,6 @@ app.use("/api/doctor",appointmentRoute);
 app.use("/api/prescriptions",prescriptionRoutes);
 //patient report
 app.use("/api/reports",reportRoutes);
-//manage profile
-app.use("/api/profile",fakeAuth,profileRoutes);
 //conduct video session
 app.use("/api/telemedicine",telemedicineRoutes);
 //dashboard summary
