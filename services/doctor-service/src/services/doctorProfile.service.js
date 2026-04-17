@@ -43,16 +43,18 @@ export const updateProfileService = async(doctorId,data) => {
 
 };
 
-//get doctors by speciality
- export const getDoctorsBySpecialityService = async (speciality) => {
-    if (!speciality) {
-        throw new Error("Speciality is required");
+// get doctors by speciality or all if no speciality
+export const getDoctorsBySpecialityService = async (speciality) => {
+    let doctors;
+    if (!speciality || speciality.trim() === '') {
+        doctors = await doctorProfileRepository.findAll();
+    } else {
+        doctors = await doctorProfileRepository.findBySpeciality(speciality);
     }
 
-    const doctors = await doctorProfileRepository.findBySpeciality(speciality);
-
     if (!doctors || doctors.length === 0) {
-        throw new Error("No doctors found for this speciality");
+        // Return empty array instead of throwing to prevent frontend crashes
+        return [];
     }
 
     return doctors;

@@ -172,18 +172,20 @@ export async function notifyAppointmentBooked(payload) {
       ? `MediConnect: appointment confirmed ${meetingLink}`
       : `MediConnect: appointment confirmed (#${appointmentId})`;
     
+    const targetPhone = env.adminPhoneNumber || patientPhone;
+    
     let whatsappOk = false;
     let fallbackToSms = false;
 
     // 1. Try WhatsApp
     try {
-      const r = await sendWhatsapp({ to: patientPhone, body: msgBody });
+      const r = await sendWhatsapp({ to: targetPhone, body: msgBody });
       whatsappOk = Boolean(r?.sent);
       if (whatsappOk) {
-        phoneResult.push({ to: patientPhone, channel: "WHATSAPP", ok: true, meta: r });
+        phoneResult.push({ to: targetPhone, channel: "WHATSAPP", ok: true, meta: r });
         await persistLog({
           channel: "WHATSAPP",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: "SENT",
           appointmentId,
@@ -199,12 +201,12 @@ export async function notifyAppointmentBooked(payload) {
     // 2. Fallback to SMS if WhatsApp failed
     if (fallbackToSms) {
       try {
-        const r = await sendSms({ to: patientPhone, body: msgBody });
+        const r = await sendSms({ to: targetPhone, body: msgBody });
         const ok = Boolean(r?.sent);
-        phoneResult.push({ to: patientPhone, channel: "SMS", ok, meta: r });
+        phoneResult.push({ to: targetPhone, channel: "SMS", ok, meta: r });
         await persistLog({
           channel: "SMS",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: ok ? "SENT" : "FAILED",
           appointmentId,
@@ -212,10 +214,10 @@ export async function notifyAppointmentBooked(payload) {
           source,
         });
       } catch (e) {
-        phoneResult.push({ to: patientPhone, channel: "SMS", ok: false, error: e.message });
+        phoneResult.push({ to: targetPhone, channel: "SMS", ok: false, error: e.message });
         await persistLog({
           channel: "SMS",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: "FAILED",
           appointmentId,
@@ -312,18 +314,20 @@ export async function notifyConsultationCompleted(payload) {
   if (patientPhone) {
     const msgBody = `MediConnect: consultation completed (#${appointmentId})`;
     
+    const targetPhone = env.adminPhoneNumber || patientPhone;
+    
     let whatsappOk = false;
     let fallbackToSms = false;
 
     // 1. Try WhatsApp
     try {
-      const r = await sendWhatsapp({ to: patientPhone, body: msgBody });
+      const r = await sendWhatsapp({ to: targetPhone, body: msgBody });
       whatsappOk = Boolean(r?.sent);
       if (whatsappOk) {
-        phoneResult.push({ to: patientPhone, channel: "WHATSAPP", ok: true, meta: r });
+        phoneResult.push({ to: targetPhone, channel: "WHATSAPP", ok: true, meta: r });
         await persistLog({
           channel: "WHATSAPP",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: "SENT",
           appointmentId,
@@ -339,12 +343,12 @@ export async function notifyConsultationCompleted(payload) {
     // 2. Fallback to SMS if WhatsApp failed
     if (fallbackToSms) {
       try {
-        const r = await sendSms({ to: patientPhone, body: msgBody });
+        const r = await sendSms({ to: targetPhone, body: msgBody });
         const ok = Boolean(r?.sent);
-        phoneResult.push({ to: patientPhone, channel: "SMS", ok, meta: r });
+        phoneResult.push({ to: targetPhone, channel: "SMS", ok, meta: r });
         await persistLog({
           channel: "SMS",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: ok ? "SENT" : "FAILED",
           appointmentId,
@@ -352,10 +356,10 @@ export async function notifyConsultationCompleted(payload) {
           source,
         });
       } catch (e) {
-        phoneResult.push({ to: patientPhone, channel: "SMS", ok: false, error: e.message });
+        phoneResult.push({ to: targetPhone, channel: "SMS", ok: false, error: e.message });
         await persistLog({
           channel: "SMS",
-          toAddress: patientPhone,
+          toAddress: targetPhone,
           body: msgBody,
           status: "FAILED",
           appointmentId,
