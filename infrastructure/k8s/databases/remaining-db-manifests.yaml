@@ -1,0 +1,141 @@
+# Notification DB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: notification-db-pvc
+  namespace: mediconnect
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-db
+  namespace: mediconnect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-db
+  template:
+    metadata:
+      labels:
+        app: notification-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: NOTIFICATION_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mediconnect-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: notification-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: notification-db-storage
+          persistentVolumeClaim:
+            claimName: notification-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-db
+  namespace: mediconnect
+spec:
+  selector:
+    app: notification-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+---
+
+# Telemedicine DB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: telemedicine-db-pvc
+  namespace: mediconnect
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemedicine-db
+  namespace: mediconnect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemedicine-db
+  template:
+    metadata:
+      labels:
+        app: telemedicine-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: TELEMEDICINE_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mediconnect-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mediconnect-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: telemedicine-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: telemedicine-db-storage
+          persistentVolumeClaim:
+            claimName: telemedicine-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemedicine-db
+  namespace: mediconnect
+spec:
+  selector:
+    app: telemedicine-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
