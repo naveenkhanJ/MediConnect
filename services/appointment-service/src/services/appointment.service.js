@@ -58,7 +58,7 @@ export const createAppointmentService = async ({
   });
 
   const paymentResponse = await axios.post(
-    `${process.env.PAYMENT_SERVICE_URL || "http://localhost:5003"}/api/payments/create`,
+    `${process.env.PAYMENT_SERVICE_URL || "http://payment-service:5004"}/api/payments/create`,
     {
       appointmentId: appointment.id,
       patientId,
@@ -159,8 +159,8 @@ export const confirmPaymentService = async ({ appointmentId, paymentId }) => {
 
   // Notify patient and doctor after confirmation — fire-and-forget
   try {
-    const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
-    const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+    const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://patient-service:5002";
+    const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://notification-service:5006";
 
     // Fetch patient contact details from patient service (internal endpoint, no auth)
     const patientRes = await axios.get(
@@ -231,9 +231,9 @@ export const handleDoctorDecisionService = async ({ appointmentId, doctorId, sta
 };
 
 async function triggerPostAcceptanceWorkflow(appointment) {
-  const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
-  const telemedicineServiceUrl = process.env.TELEMEDICINE_SERVICE_URL || "http://localhost:5005";
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006";
+  const patientServiceUrl = process.env.PATIENT_SERVICE_URL || "http://patient-service:5002";
+  const telemedicineServiceUrl = process.env.TELEMEDICINE_SERVICE_URL || "http://telemedicine-service:5005";
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || "http://notification-service:5006";
   const internalSecret = process.env.INTERNAL_SECRET || "mediconnect-internal";
 
   let patientEmail, patientPhone, doctorEmail;

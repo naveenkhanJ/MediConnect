@@ -118,17 +118,20 @@ services:
   auth-service:
     build: ./services/auth-service
     container_name: auth-service
+    restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
       PORT: 5000
-      DB_HOST: auth-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: auth_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
       JWT_SECRET: your_secret_key
       INTERNAL_SECRET: mediconnect-internal
+      PATIENT_SERVICE_URL: http://patient-service:5002
+      DOCTOR_SERVICE_URL: http://doctor-service:5009
     depends_on:
       - auth-db
     networks:
@@ -137,17 +140,20 @@ services:
   patient-service:
     build: ./services/patient-service/backend
     container_name: patient-service
+    restart: unless-stopped
     ports:
       - "5002:5002"
     environment:
       PORT: 5002
-      DB_HOST: patient-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: patient_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
       JWT_SECRET: your_secret_key
       INTERNAL_SECRET: mediconnect-internal
+      APPOINTMENT_SERVICE_URL: http://appointment-service:5003
+      DOCTOR_SERVICE_URL: http://doctor-service:5009
     depends_on:
       - patient-db
     networks:
@@ -156,11 +162,12 @@ services:
   doctor-service:
     build: ./services/doctor-service
     container_name: doctor-service
+    restart: unless-stopped
     ports:
       - "5009:5009"
     environment:
       PORT: 5009
-      DB_HOST: doctor-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: doctor_db
       DB_USER: postgres
@@ -175,11 +182,12 @@ services:
   appointment-service:
     build: ./services/appointment-service
     container_name: appointment-service
+    restart: unless-stopped
     ports:
       - "5003:5003"
     environment:
       PORT: 5003
-      DB_HOST: appointment-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: appointment_db
       DB_USER: postgres
@@ -197,11 +205,12 @@ services:
   payment-service:
     build: ./services/payment-service
     container_name: payment-service
+    restart: unless-stopped
     ports:
       - "5004:5004"
     environment:
       PORT: 5004
-      DB_HOST: payment-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: payment_db
       DB_USER: postgres
@@ -217,11 +226,12 @@ services:
   notification-service:
     build: ./services/notification-service
     container_name: notification-service
+    restart: unless-stopped
     ports:
       - "5006:5006"
     environment:
       PORT: 5006
-      DB_HOST: notification-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: notification_db
       DB_USER: postgres
@@ -238,17 +248,18 @@ services:
   telemedicine-service:
     build: ./services/telemedicine-service
     container_name: telemedicine-service
+    restart: unless-stopped
     ports:
       - "5005:5005"
     environment:
       PORT: 5005
-      DB_HOST: telemedicine-db
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: telemedicine_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
-      APPOINTMENT_SERVICE_URL: http://appointment-service:5003/api
-      NOTIFICATION_SERVICE_URL: http://notification-service:5006/api/v1
+      APPOINTMENT_SERVICE_URL: http://appointment-service:5003
+      NOTIFICATION_SERVICE_URL: http://notification-service:5006
     depends_on:
       - telemedicine-db
     networks:
@@ -257,6 +268,7 @@ services:
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway
+    restart: unless-stopped
     ports:
       - "4000:4000"
     environment:
@@ -277,6 +289,7 @@ services:
   frontend:
     build: ./frontend/mediconnect
     container_name: frontend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:

@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import axios from "axios";
 import { Plus, Trash2, FileText, Stethoscope } from "lucide-react";
 
-export default function CreatePrescriptionPage() {
+function PrescriptionForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -151,3 +151,11 @@ export default function CreatePrescriptionPage() {
     </div>
   );
 }
+
+export default function CreatePrescriptionPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading prescription form...</div>}>
+      <PrescriptionForm />
+    </Suspense>
+  );
+}

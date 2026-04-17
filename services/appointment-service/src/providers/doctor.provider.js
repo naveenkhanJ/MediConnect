@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const DOCTOR_SERVICE = process.env.DOCTOR_SERVICE_URL || "http://localhost:5009";
+const DOCTOR_SERVICE = process.env.DOCTOR_SERVICE_URL || "http://doctor-service:5009";
 
 export const searchDoctorsBySpecialty = async (specialty) => {
   const response = await axios.get(`${DOCTOR_SERVICE}/api/doctors`, {

@@ -3,6 +3,9 @@ import axios from "axios";
 import { registerService, loginService } from "../services/auth.service.js";
 import { deleteUser } from "../models/user.model.js";
 
+const PATIENT_SERVICE_URL = process.env.PATIENT_SERVICE_URL || "http://localhost:5002";
+const DOCTOR_SERVICE_URL = process.env.DOCTOR_SERVICE_URL || "http://localhost:5009";
+
 export const register = async (req, res) => {
   try {
     const {
@@ -52,7 +55,7 @@ export const register = async (req, res) => {
           throw new Error("name, age, gender, contact required for patient");
         }
 
-        await axios.post("http://localhost:5002/api/patients/register", {
+        await axios.post(`${PATIENT_SERVICE_URL}/api/patients/register`, {
           user_id: user.id,
           email,
           password,
@@ -82,7 +85,7 @@ export const register = async (req, res) => {
         }
 
         // doctor-service runs on 5009 and uses `id` as the doctorId (integer).
-        await axios.post("http://localhost:5009/api/profile/register", {
+        await axios.post(`${DOCTOR_SERVICE_URL}/api/profile/register`, {
           id: user.id,
           email,
           password,

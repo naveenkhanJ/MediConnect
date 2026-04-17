@@ -5,16 +5,25 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Service URLs — use env vars in Docker, fall back to localhost for local dev
-const AUTH_SERVICE        = process.env.AUTH_SERVICE_URL        || 'http://localhost:5000';
-const PATIENT_SERVICE     = process.env.PATIENT_SERVICE_URL     || 'http://localhost:5002';
-const APPOINTMENT_SERVICE = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:5003';
-const PAYMENT_SERVICE     = process.env.PAYMENT_SERVICE_URL     || 'http://localhost:5004';
+const AUTH_SERVICE             = process.env.AUTH_SERVICE_URL         || 'http://localhost:5000';
+const PATIENT_SERVICE          = process.env.PATIENT_SERVICE_URL      || 'http://localhost:5002';
+const APPOINTMENT_SERVICE      = process.env.APPOINTMENT_SERVICE_URL  || 'http://localhost:5003';
+const PAYMENT_SERVICE          = process.env.PAYMENT_SERVICE_URL      || 'http://localhost:5004';
+const DOCTOR_SERVICE_URL       = process.env.DOCTOR_SERVICE_URL       || 'http://localhost:5009';
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5006';
+const TELEMEDICINE_SERVICE_URL = process.env.TELEMEDICINE_SERVICE_URL || 'http://localhost:5005';
+const AI_SERVICE_URL           = process.env.AI_SERVICE_URL           || 'http://localhost:5005';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 // PayHere sends notify as application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+//health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'UP', service: 'API Gateway' });
+});
 
 //login
 
@@ -319,9 +328,6 @@ app.put('/api/payments/:id/fail', async (req, res) => {
 });
 
 //_______________________doctor routes ______________________
-
-const DOCTOR_SERVICE_URL = "http://localhost:5009";
-const TELEMEDICINE_SERVICE_URL = process.env.TELEMEDICINE_SERVICE_URL || "http://localhost:5005";
 
 // Create doctor profile
 // Frontend calls:POST /api/profile
@@ -629,7 +635,7 @@ app.get("/api/prescriptions/:id/pdf", async (req, res) => {
 app.get("/api/doctors/patients/:patientId/reports", async (req, res) => {
   try {
     const response = await axios.get(
-      `http://localhost:5002/api/reports/patients/${req.params.patientId}`,
+      `${PATIENT_SERVICE}/api/reports/patients/${req.params.patientId}`,
       {
         headers: {
           Authorization: req.headers.authorization || ""
@@ -783,7 +789,7 @@ app.get("/api/doctors/:id/availability", async (req, res) => {
 
 //_____________________________AI SYMPTOM CHECKER_________________
 
-const AI_SERVICE_URL = "http://localhost:5005";
+// AI_SERVICE defined at top
 
 // Check symptoms (AI analysis)
 

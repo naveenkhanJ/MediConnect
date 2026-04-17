@@ -213,7 +213,9 @@ const createDoctorAppointment = async (req, res) => {
   try {
     const { patientId, doctorId, appointmentDate, timeSlot, consultationType } = req.body;
 
-    const response = await fetch('http://localhost:5003/api/appointments/internal', {
+    const appointmentServiceUrl = process.env.APPOINTMENT_SERVICE_URL || "http://appointment-service:5003";
+
+    const response = await fetch(`${appointmentServiceUrl}/api/appointments/internal`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

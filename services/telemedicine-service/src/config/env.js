@@ -14,9 +14,9 @@ const env = {
   jitsiAppSecret: process.env.JITSI_APP_SECRET || null,
   useMockAppointment: process.env.USE_MOCK_APPOINTMENT === "true",
   appointmentServiceUrl:
-    process.env.APPOINTMENT_SERVICE_URL || "http://localhost:5001/api",
+    process.env.APPOINTMENT_SERVICE_URL || "http://appointment-service:5003/api",
   notificationServiceUrl:
-    process.env.NOTIFICATION_SERVICE_URL || "http://localhost:5006/api/v1",
+    process.env.NOTIFICATION_SERVICE_URL || "http://notification-service:5006/api/v1",
   rabbitmqUrl: process.env.RABBITMQ_URL || "",
   rabbitmqExchange: process.env.RABBITMQ_EXCHANGE || "mediconnect.events",
   demoPatientEmail: process.env.DEMO_PATIENT_EMAIL || "patient@example.com",

@@ -40,6 +40,10 @@ app.use("/api/telemedicine",telemedicineRoutes);
 app.use("/api/dashboard",getDashboardSummaryRoutes);
 
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ service: "doctor-service", status: "ok" });
+});
+
 app.get("/doctor", (req, res) => {
   res.status(200).json({ service: "doctor-service", status: "ok" });
 });
