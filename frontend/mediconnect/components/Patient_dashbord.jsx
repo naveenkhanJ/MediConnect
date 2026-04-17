@@ -126,7 +126,9 @@ export default function Dashboard() {
             Book appointments easily and stay healthy.
           </p>
         </div>
-        <div className="w-32 h-24 bg-white/20 rounded-xl"></div>
+        <div className="w-32 h-24 bg-white/20 rounded-xl">
+         
+        </div>
       </div>
 
       {/* Layout */}
