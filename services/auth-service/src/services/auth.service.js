@@ -28,7 +28,10 @@ export const registerService = async (email, password, role) => {
   // 🔥 HASH PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await createUser(email, hashedPassword, role);
+  // Doctors need approval, others are approved by default
+  const isApproved = role !== "doctor";
+
+  const user = await createUser(email, hashedPassword, role, isApproved);
 
   const token = generateToken(user);
 
@@ -47,6 +50,10 @@ export const loginService = async (email, password) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error("Invalid password");
+  }
+
+  if (!user.is_approved) {
+    throw new Error("Your account is pending admin approval.");
   }
 
   const token = generateToken(user);
