@@ -227,4 +227,4 @@ const getPatientContactInternal = async (req, res) => {
   }
 };
 
-export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment, getPatientContactInternal };
+export { registerPatient, getProfile, updateProfile, uploadReport, bookAppointment, getPrescriptions, createDoctorAppointment,deleteAccount,getReports };
