@@ -5,6 +5,12 @@ export const getAIResponse = async (symptoms) => {
 You are a medical assistant.
 Analyze these symptoms: ${symptoms}
 
+IMPORTANT RULES:
+- Return ONLY valid JSON
+- Do NOT use markdown
+- Do NOT wrap in triple backticks
+- Do NOT add explanations outside JSON
+
 Return JSON format:
 {
   "possibleConditions": [],

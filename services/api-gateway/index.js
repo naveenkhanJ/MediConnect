@@ -134,6 +134,26 @@ app.get('/patients/reports', async (req, res) => {
 });
 
 
+//view report by the doctor
+app.get('/patients/reports', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${PATIENT_SERVICE}/api/patients/reports`,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+        },
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(
+      err.response?.data || { message: "Server Error" }
+    );
+  }
+});
+
 // ─── APPOINTMENT ROUTES ───────────────────────────────────────────────────────
 
 // Search doctors by specialty

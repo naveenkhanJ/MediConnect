@@ -7,12 +7,12 @@ export default function TodayAppointments() {
   const [appointments, setAppointments] = useState([]);
    const router = useRouter();
   useEffect(() => {
-    fetch("http://localhost:4000/api/appointments/doctor/bb910126-bc62-4d81-8c8f-641325b178e1/today", {
+    fetch("http://localhost:4000/api/appointments/doctor/d5aeffa5-4623-4d93-9fc3-3b971e72751d/today", {
       headers: { Authorization: "mock-token" },
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("API RESPONSE 👉", data);
+        console.log("API RESPONSE ", data);
 
         // FIX: ensure it's always an array
         if (Array.isArray(data)) {
@@ -64,11 +64,14 @@ export default function TodayAppointments() {
                     >
                       Add Prescription
                     </button>
-
-                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                      View Report
-                    </button>
-
+                      <button
+                        onClick={() =>
+                          router.push(`/doctor/reports?patientId=${a.patientId}`)
+                        }
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        View Report
+                      </button>
                     <button className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-purple-600">
                       Start Consultation
                     </button>

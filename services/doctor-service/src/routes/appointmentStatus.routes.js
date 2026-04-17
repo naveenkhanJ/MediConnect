@@ -14,4 +14,4 @@ router.get("/appointments/pending",fakeAuth,requireVerifiedDoctor,getPendingAppo
 //approve/reject appointment
 router.patch("/appointments/:appointmentId/decision",fakeAuth,requireVerifiedDoctor,decideAppointmentController);
 
-export default router; 
+ export default router; 
